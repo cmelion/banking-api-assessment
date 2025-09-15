@@ -5,18 +5,19 @@ import { FastifyInstance } from 'fastify';
 describe('Users Endpoints', () => {
   let app: FastifyInstance;
   let authToken: string;
+  let testEmail: string;
 
   beforeEach(async () => {
     app = await createApp();
     await app.ready();
 
     // Create a user and get auth token
-    const uniqueEmail = `testuser-${Date.now()}@example.com`;
+    testEmail = `testuser-${Date.now()}@example.com`;
     const signupResponse = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/signup',
       payload: {
-        email: uniqueEmail,
+        email: testEmail,
         password: 'SecurePassword123',
         name: 'Test User',
       },
@@ -47,7 +48,7 @@ describe('Users Endpoints', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.success).toBe(true);
-      expect(body.data.email).toBe('testuser@example.com');
+      expect(body.data.email).toBe(testEmail);
       expect(body.data.name).toBe('Test User');
       expect(body.data.accounts).toBeDefined();
     });

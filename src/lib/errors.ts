@@ -46,6 +46,12 @@ export class ConflictError extends BaseError {
   }
 }
 
+export class BusinessError extends BaseError {
+  constructor(message: string, details?: any) {
+    super(message, 400, 'BUSINESS_ERROR', details);
+  }
+}
+
 export class InsufficientFundsError extends BaseError {
   constructor(availableBalance: string, requestedAmount: string) {
     super(
