@@ -9,6 +9,8 @@ async function accountRoutes(fastify: FastifyInstance) {
   // Create account
   fastify.post('/', {
     schema: {
+      description: 'Create a new bank account',
+      tags: ['Accounts'],
       body: createAccountSchema,
       response: {
         201: {
@@ -37,6 +39,8 @@ async function accountRoutes(fastify: FastifyInstance) {
   // List accounts
   fastify.get('/', {
     schema: {
+      description: 'List user accounts with pagination',
+      tags: ['Accounts'],
       querystring: listAccountsSchema,
       response: {
         200: {
@@ -72,6 +76,8 @@ async function accountRoutes(fastify: FastifyInstance) {
   // Get account by ID
   fastify.get('/:id', {
     schema: {
+      description: 'Get account details by ID',
+      tags: ['Accounts'],
       params: getAccountSchema,
       response: {
         200: {
@@ -102,6 +108,8 @@ async function accountRoutes(fastify: FastifyInstance) {
   // Update account
   fastify.patch('/:id', {
     schema: {
+      description: 'Update account information',
+      tags: ['Accounts'],
       params: getAccountSchema,
       body: updateAccountSchema,
       response: {
@@ -131,6 +139,8 @@ async function accountRoutes(fastify: FastifyInstance) {
   // Get account balance
   fastify.get('/:id/balance', {
     schema: {
+      description: 'Get current account balance',
+      tags: ['Accounts'],
       params: getAccountSchema,
       response: {
         200: {

@@ -56,6 +56,15 @@ export async function createApp(): Promise<FastifyInstance> {
         schemes: ['http'],
         consumes: ['application/json'],
         produces: ['application/json'],
+        tags: [
+          { name: 'Authentication', description: 'User authentication and authorization' },
+          { name: 'Users', description: 'User profile and management' },
+          { name: 'Accounts', description: 'Bank account management and operations' },
+          { name: 'Transactions', description: 'Transaction history and details' },
+          { name: 'Transfers', description: 'Money transfers between accounts' },
+          { name: 'Cards', description: 'Credit and debit card management' },
+          { name: 'Statements', description: 'Account statement generation and access' },
+        ],
         securityDefinitions: {
           Bearer: {
             type: 'apiKey',

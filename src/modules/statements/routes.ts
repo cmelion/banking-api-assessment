@@ -6,6 +6,8 @@ async function statementRoutes(fastify: FastifyInstance) {
   // Get statement by ID
   fastify.get('/:id', {
     schema: {
+      description: 'Get statement details by ID',
+      tags: ['Statements'],
       params: getStatementSchema,
       response: {
         200: {
@@ -39,6 +41,8 @@ export async function accountStatementRoutes(fastify: FastifyInstance) {
   // Generate statement for account
   fastify.post('/:accountId/statements/generate', {
     schema: {
+      description: 'Generate a new statement for an account',
+      tags: ['Statements'],
       params: { type: 'object', properties: { accountId: { type: 'string' } } },
       body: generateStatementSchema,
       response: {
@@ -69,6 +73,8 @@ export async function accountStatementRoutes(fastify: FastifyInstance) {
   // List account statements
   fastify.get('/:accountId/statements', {
     schema: {
+      description: 'List statements for an account',
+      tags: ['Statements'],
       params: { type: 'object', properties: { accountId: { type: 'string' } } },
       querystring: listAccountStatementsSchema,
       response: {

@@ -6,6 +6,8 @@ async function cardRoutes(fastify: FastifyInstance) {
   // Get card by ID
   fastify.get('/:id', {
     schema: {
+      description: 'Get card details by ID',
+      tags: ['Cards'],
       params: getCardSchema,
       response: {
         200: {
@@ -36,6 +38,8 @@ async function cardRoutes(fastify: FastifyInstance) {
   // Update card
   fastify.patch('/:id', {
     schema: {
+      description: 'Update card information',
+      tags: ['Cards'],
       params: getCardSchema,
       body: updateCardSchema,
       response: {
@@ -69,6 +73,8 @@ export async function accountCardRoutes(fastify: FastifyInstance) {
   // Create card for account
   fastify.post('/:accountId/cards', {
     schema: {
+      description: 'Issue a new card for an account',
+      tags: ['Cards'],
       params: { type: 'object', properties: { accountId: { type: 'string' } } },
       body: createCardSchema,
       response: {
@@ -99,6 +105,8 @@ export async function accountCardRoutes(fastify: FastifyInstance) {
   // List account cards
   fastify.get('/:accountId/cards', {
     schema: {
+      description: 'List cards for an account',
+      tags: ['Cards'],
       params: { type: 'object', properties: { accountId: { type: 'string' } } },
       querystring: listAccountCardsSchema,
       response: {

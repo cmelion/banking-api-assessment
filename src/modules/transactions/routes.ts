@@ -6,6 +6,8 @@ async function transactionRoutes(fastify: FastifyInstance) {
   // Get transaction by ID
   fastify.get('/:id', {
     schema: {
+      description: 'Get transaction details by ID',
+      tags: ['Transactions'],
       params: getTransactionSchema,
       response: {
         200: {
@@ -41,6 +43,8 @@ export async function accountTransactionRoutes(fastify: FastifyInstance) {
   // Get account transactions
   fastify.get('/:accountId/transactions', {
     schema: {
+      description: 'Get transaction history for an account',
+      tags: ['Transactions'],
       params: { type: 'object', properties: { accountId: { type: 'string' } } },
       querystring: {
         type: 'object',
@@ -86,6 +90,8 @@ export async function accountTransactionRoutes(fastify: FastifyInstance) {
   // Get account transaction summary
   fastify.get('/:accountId/transactions/summary', {
     schema: {
+      description: 'Get transaction summary for an account',
+      tags: ['Transactions'],
       params: { type: 'object', properties: { accountId: { type: 'string' } } },
       querystring: {
         type: 'object',

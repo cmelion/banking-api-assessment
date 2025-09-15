@@ -6,6 +6,8 @@ async function transferRoutes(fastify: FastifyInstance) {
   // Create transfer
   fastify.post('/', {
     schema: {
+      description: 'Create a money transfer between accounts',
+      tags: ['Transfers'],
       body: createTransferSchema,
       response: {
         201: {
@@ -37,6 +39,8 @@ async function transferRoutes(fastify: FastifyInstance) {
   // List transfers
   fastify.get('/', {
     schema: {
+      description: 'List transfers for the authenticated user',
+      tags: ['Transfers'],
       querystring: listTransfersSchema,
       response: {
         200: {
@@ -73,6 +77,8 @@ async function transferRoutes(fastify: FastifyInstance) {
   // Get transfer by ID
   fastify.get('/:id', {
     schema: {
+      description: 'Get transfer details by ID',
+      tags: ['Transfers'],
       params: getTransferSchema,
       response: {
         200: {
@@ -105,6 +111,8 @@ async function transferRoutes(fastify: FastifyInstance) {
   // Cancel transfer
   fastify.patch('/:id/cancel', {
     schema: {
+      description: 'Cancel a pending transfer',
+      tags: ['Transfers'],
       params: cancelTransferSchema,
       response: {
         200: {
