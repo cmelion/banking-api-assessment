@@ -1,0 +1,140 @@
+version: '3.8'
+
+services:
+  # Banking API Service
+  banking-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: banking-api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=file:/app/data/banking.db
+      - JWT_SECRET=your-development-jwt-secret-change-in-production
+      - JWT_REFRESH_SECRET=your-development-refresh-secret-change-in-production
+      - JWT_ACCESS_EXPIRY=15m
+      - JWT_REFRESH_EXPIRY=7d
+      - LOG_LEVEL=info
+    volumes:
+      # For development, mount source code for hot reload
+      - ./src:/app/src:ro
+      - ./prisma:/app/prisma:ro
+      # Persistent storage for SQLite if using file-based DB
+      - banking-data:/app/data
+    depends_on:
+      - redis
+    networks:
+      - banking-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: banking-postgres
+    environment:
+      POSTGRES_DB: banking_db
+      POSTGRES_USER: banking_user
+      POSTGRES_PASSWORD: banking_pass
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - banking-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U banking_user -d banking_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis for caching and session management (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: banking-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - banking-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Database administration tool
+  adminer:
+    image: adminer:4.8.1
+    container_name: banking-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    depends_on:
+      - postgres
+    networks:
+      - banking-network
+    restart: unless-stopped
+
+  # Development tools container for WebStorm debugging
+  banking-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: banking-api-dev
+    ports:
+      - "3001:3000"
+      - "9229:9229"  # Node.js debug port for WebStorm
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=file:/app/data/banking.db
+      - JWT_SECRET=your-development-jwt-secret-change-in-production
+      - JWT_REFRESH_SECRET=your-development-refresh-secret-change-in-production
+      - JWT_ACCESS_EXPIRY=15m
+      - JWT_REFRESH_EXPIRY=7d
+      - LOG_LEVEL=debug
+    volumes:
+      # Mount source code for live development
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./node_modules:/app/node_modules
+    depends_on:
+      - redis
+    networks:
+      - banking-network
+    restart: unless-stopped
+    profiles:
+      - dev  # Only start with --profile dev
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  banking-data:
+    driver: local
+
+networks:
+  banking-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

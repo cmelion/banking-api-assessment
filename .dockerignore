@@ -1,0 +1,67 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+.nyc_output
+
+# Build outputs
+dist
+build
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Development files
+README.md
+CHANGELOG.md
+docs/
+tests/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore

@@ -1,0 +1,35 @@
+# Development Dockerfile optimized for WebStorm debugging
+FROM node:20-alpine
+
+# Install necessary tools for development
+RUN apk add --no-cache libc6-compat git
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy Prisma schema for client generation
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Create a non-root user for development
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+# Create data directory with proper permissions
+RUN mkdir -p /app/data && chown nodejs:nodejs /app/data
+
+# Copy source code (will be overridden by volume mount)
+COPY --chown=nodejs:nodejs . .
+
+USER nodejs
+
+EXPOSE 3000 9229
+
+ENV NODE_ENV=development
+ENV PORT=3000
+
+# Start with debugging enabled for WebStorm
+CMD ["npx", "tsx", "--inspect=0.0.0.0:9229", "src/index.ts"]
