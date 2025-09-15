@@ -59,6 +59,17 @@ jobs:
         timeout $HEALTH_CHECK_TIMEOUT bash -c 'until curl -f $HEALTH_CHECK_URL; do echo "Service not ready, waiting $HEALTH_CHECK_INTERVAL seconds..."; sleep $HEALTH_CHECK_INTERVAL; done'
         echo "Service is ready!"
 
+    - name: Setup test database
+      env:
+        DATABASE_URL: file:./test.db
+        JWT_SECRET: test-jwt-secret-for-ci-environment-32-chars-minimum
+        JWT_REFRESH_SECRET: test-refresh-secret-for-ci-environment-32-chars-minimum
+        NODE_ENV: test
+      run: |
+        echo "Setting up test database..."
+        npx prisma db push --force-reset
+        echo "Database setup complete"
+
     - name: Run tests with coverage
       env:
         DATABASE_URL: file:./test.db
