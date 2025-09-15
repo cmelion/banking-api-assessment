@@ -50,10 +50,21 @@ jobs:
       run: docker compose up -d --build
 
     - name: Wait for services to be ready
+      env:
+        HEALTH_CHECK_URL: http://localhost:3000/health
+        HEALTH_CHECK_TIMEOUT: 60
+        HEALTH_CHECK_INTERVAL: 2
       run: |
-        timeout 60 bash -c 'until curl -f http://localhost:3000/health; do sleep 2; done'
+        echo "Waiting for service at $HEALTH_CHECK_URL to be ready..."
+        timeout $HEALTH_CHECK_TIMEOUT bash -c 'until curl -f $HEALTH_CHECK_URL; do echo "Service not ready, waiting $HEALTH_CHECK_INTERVAL seconds..."; sleep $HEALTH_CHECK_INTERVAL; done'
+        echo "Service is ready!"
 
     - name: Run tests with coverage
+      env:
+        DATABASE_URL: file:./test.db
+        JWT_SECRET: test-jwt-secret-for-ci
+        JWT_REFRESH_SECRET: test-refresh-secret-for-ci
+        NODE_ENV: test
       run: npm run test:coverage
 
     - name: Build for production
