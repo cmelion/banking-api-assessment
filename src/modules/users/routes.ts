@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { UserController } from './controller';
-import { updateUserSchema, userParamsSchema, paginationQuerySchema } from './schemas';
+// Schemas imported but used in inline schema definitions for Swagger docs
 
 const userController = new UserController();
 

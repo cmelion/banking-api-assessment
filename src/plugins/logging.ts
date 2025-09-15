@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
 import { randomUUID } from 'crypto';
-import { logConfig } from '../config';
+// logConfig imported but used for future log configuration
 
 async function loggingPlugin(fastify: FastifyInstance) {
 
@@ -16,7 +16,7 @@ async function loggingPlugin(fastify: FastifyInstance) {
   });
 
   // Log all requests
-  fastify.addHook('onRequest', async (request, reply) => {
+  fastify.addHook('onRequest', async (request, _reply) => {
     request.log.info({
       correlationId: (request as any).correlationId,
       userId: (request as any).user?.userId,

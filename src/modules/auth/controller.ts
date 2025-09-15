@@ -27,7 +27,7 @@ export class AuthController {
     return response;
   }
 
-  async login(request: FastifyRequest<{ Body: LoginRequest }>, reply: FastifyReply) {
+  async login(request: FastifyRequest<{ Body: LoginRequest }>, _reply: FastifyReply) {
     // Validate request body
     const validation = loginSchema.safeParse(request.body);
     if (!validation.success) {
@@ -46,7 +46,7 @@ export class AuthController {
     return response;
   }
 
-  async refresh(request: FastifyRequest<{ Body: RefreshTokenRequest }>, reply: FastifyReply) {
+  async refresh(request: FastifyRequest<{ Body: RefreshTokenRequest }>, _reply: FastifyReply) {
     // Validate request body
     const validation = refreshTokenSchema.safeParse(request.body);
     if (!validation.success) {
@@ -65,7 +65,7 @@ export class AuthController {
     return response;
   }
 
-  async logout(request: FastifyRequest<{ Body: RefreshTokenRequest }>, reply: FastifyReply) {
+  async logout(request: FastifyRequest<{ Body: RefreshTokenRequest }>, _reply: FastifyReply) {
     // Validate request body
     const validation = refreshTokenSchema.safeParse(request.body);
     if (!validation.success) {

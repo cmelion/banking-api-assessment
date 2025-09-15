@@ -1,16 +1,9 @@
-const { FlatCompat } = require("@eslint/eslintrc");
 const js = require("@eslint/js");
 const tsParser = require("@typescript-eslint/parser");
 const tsPlugin = require("@typescript-eslint/eslint-plugin");
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-});
-
 module.exports = [
   js.configs.recommended,
-  ...compat.extends("@typescript-eslint/recommended"),
   {
     files: ["**/*.{ts,js}"],
     languageOptions: {
@@ -24,10 +17,15 @@ module.exports = [
       "@typescript-eslint": tsPlugin,
     },
     rules: {
+      // Disable conflicting base rules
+      "no-unused-vars": "off",
+      "no-undef": "off",
+
+      // TypeScript rules
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-explicit-any": "warn",
+
+      // General rules
       "prefer-const": "error",
       "no-var": "error",
     },

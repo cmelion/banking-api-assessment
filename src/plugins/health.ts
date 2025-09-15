@@ -4,7 +4,7 @@ import { checkDatabaseHealth } from '../db/connection';
 
 async function healthPlugin(fastify: FastifyInstance) {
   // Liveness probe - basic health check
-  fastify.get('/health', async (request, reply) => {
+  fastify.get('/health', async (_request, _reply) => {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
@@ -14,7 +14,7 @@ async function healthPlugin(fastify: FastifyInstance) {
   });
 
   // Readiness probe - comprehensive health check
-  fastify.get('/ready', async (request, reply) => {
+  fastify.get('/ready', async (_request, reply) => {
     const checks = {
       database: false,
       memory: true,

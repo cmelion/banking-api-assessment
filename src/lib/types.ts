@@ -1,55 +1,47 @@
 // Banking API Types and Enums
 
-export const UserStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  SUSPENDED: 'SUSPENDED',
-} as const;
-export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
+export enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+}
 
-export const AccountType = {
-  CHECKING: 'CHECKING',
-  SAVINGS: 'SAVINGS',
-  CREDIT: 'CREDIT',
-} as const;
-export type AccountType = (typeof AccountType)[keyof typeof AccountType];
+export enum AccountType {
+  CHECKING = 'CHECKING',
+  SAVINGS = 'SAVINGS',
+  CREDIT = 'CREDIT',
+}
 
-export const AccountStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  FROZEN: 'FROZEN',
-  CLOSED: 'CLOSED',
-} as const;
-export type AccountStatus = (typeof AccountStatus)[keyof typeof AccountStatus];
+export enum AccountStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  FROZEN = 'FROZEN',
+  CLOSED = 'CLOSED',
+}
 
-export const TransactionType = {
-  DEBIT: 'DEBIT',
-  CREDIT: 'CREDIT',
-} as const;
-export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
+export enum TransactionType {
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT',
+}
 
-export const TransferStatus = {
-  PENDING: 'PENDING',
-  COMPLETED: 'COMPLETED',
-  FAILED: 'FAILED',
-  CANCELLED: 'CANCELLED',
-} as const;
-export type TransferStatus = (typeof TransferStatus)[keyof typeof TransferStatus];
+export enum TransferStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+}
 
-export const CardStatus = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  BLOCKED: 'BLOCKED',
-  EXPIRED: 'EXPIRED',
-} as const;
-export type CardStatus = (typeof CardStatus)[keyof typeof CardStatus];
+export enum CardStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  BLOCKED = 'BLOCKED',
+  EXPIRED = 'EXPIRED',
+}
 
-// User Roles
-export const UserRole = {
-  USER: 'USER',
-  ADMIN: 'ADMIN',
-} as const;
-export type UserRole = (typeof UserRole)[keyof typeof UserRole];
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
 
 // API Response Types
 export interface ApiResponse<T = any> {
