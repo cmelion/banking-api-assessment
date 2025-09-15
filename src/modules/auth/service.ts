@@ -98,9 +98,7 @@ export class AuthService {
       email: user.email,
       name: user.name,
       status: user.status,
-      role: user.role,
       createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
     };
 
     return { user: userResponse, tokens };
