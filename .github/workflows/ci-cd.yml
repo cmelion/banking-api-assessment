@@ -47,7 +47,7 @@ jobs:
       run: docker build -t banking-api:test .
 
     - name: Start test environment
-      run: docker-compose up -d --build
+      run: docker compose up -d --build
 
     - name: Wait for services to be ready
       run: |
@@ -60,7 +60,7 @@ jobs:
       run: npm run build
 
     - name: Stop test environment
-      run: docker-compose down
+      run: docker compose down
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4
