@@ -11,7 +11,7 @@ This is a production-ready banking REST service assessment built with AI-assiste
 - **Runtime**: Node.js (LTS) with TypeScript
 - **Web Framework**: Fastify (high performance, built-in schema validation)
 - **Database**: Prisma ORM with SQLite (development) with upgrade path to PostgreSQL
-- **Validation**: Zod schemas with Fastify integration
+- **Validation**: JSON schemas with Fastify integration
 - **Authentication**: JWT (access + refresh tokens), Argon2id password hashing
 - **Logging**: Pino (structured JSON logs with correlation IDs)
 - **Testing**: Vitest for unit and integration tests
@@ -112,7 +112,7 @@ docker-compose down     # Stop all services
 - **Never store raw card PAN** - Only masked/tokenized values
 - **Password Security** - Argon2id hashing with per-user salt
 - **JWT Security** - Short-lived access tokens, rotating refresh tokens
-- **Input Validation** - Zod schemas for all requests
+- **Input Validation** - JSON schemas for all requests
 - **Money Precision** - Use Decimal type or integer cents to avoid floating point errors
 - **Idempotency** - Support `Idempotency-Key` header for transfers
 - **Audit Trail** - Log all mutations with user context
