@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { AuthController } from './controller';
-import { signupSchema, loginSchema, refreshTokenSchema } from './schemas';
+// Schemas imported but used in inline schema definitions for Swagger docs
 
 const authController = new AuthController();
 

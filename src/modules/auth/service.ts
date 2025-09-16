@@ -93,7 +93,13 @@ export class AuthService {
     const tokens = await this.generateTokens(user.id, user.email);
 
     // Remove passwordHash from response
-    const { passwordHash, ...userResponse } = user;
+    const userResponse = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      status: user.status,
+      createdAt: user.createdAt,
+    };
 
     return { user: userResponse, tokens };
   }

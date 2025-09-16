@@ -7,7 +7,7 @@ import { ValidationError } from '../../lib/errors';
 const userService = new UserService();
 
 export class UserController {
-  async getCurrentUser(request: FastifyRequest, reply: FastifyReply) {
+  async getCurrentUser(request: FastifyRequest, _reply: FastifyReply) {
     const user = request.user as JwtPayload;
     const result = await userService.getCurrentUser(user.userId);
 
@@ -21,7 +21,7 @@ export class UserController {
 
   async updateCurrentUser(
     request: FastifyRequest<{ Body: UpdateUserRequest }>,
-    reply: FastifyReply
+    _reply: FastifyReply
   ) {
     // Validate request body
     const validation = updateUserSchema.safeParse(request.body);
@@ -42,7 +42,7 @@ export class UserController {
 
   async getAllUsers(
     request: FastifyRequest<{ Querystring: PaginationQuery }>,
-    reply: FastifyReply
+    _reply: FastifyReply
   ) {
     // Validate query parameters
     const validation = paginationQuerySchema.safeParse(request.query);
@@ -64,7 +64,7 @@ export class UserController {
     return response;
   }
 
-  async getUserById(request: FastifyRequest<{ Params: UserParams }>, reply: FastifyReply) {
+  async getUserById(request: FastifyRequest<{ Params: UserParams }>, _reply: FastifyReply) {
     // Validate params
     const validation = userParamsSchema.safeParse(request.params);
     if (!validation.success) {

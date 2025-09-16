@@ -1,0 +1,119 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run TypeScript check
+      run: npm run typecheck
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Build Docker image
+      run: docker build -t banking-api:test .
+
+    - name: Start test environment
+      run: docker compose up -d --build
+
+    - name: Wait for services to be ready
+      env:
+        HEALTH_CHECK_URL: http://localhost:3000/health
+        HEALTH_CHECK_TIMEOUT: 60
+        HEALTH_CHECK_INTERVAL: 2
+      run: |
+        echo "Waiting for service at $HEALTH_CHECK_URL to be ready..."
+        timeout $HEALTH_CHECK_TIMEOUT bash -c 'until curl -f $HEALTH_CHECK_URL; do echo "Service not ready, waiting $HEALTH_CHECK_INTERVAL seconds..."; sleep $HEALTH_CHECK_INTERVAL; done'
+        echo "Service is ready!"
+
+    - name: Setup test database
+      env:
+        DATABASE_URL: file:./test.db
+        JWT_SECRET: test-jwt-secret-for-ci-environment-32-chars-minimum
+        JWT_REFRESH_SECRET: test-refresh-secret-for-ci-environment-32-chars-minimum
+        NODE_ENV: test
+      run: |
+        echo "Setting up test database..."
+        npx prisma db push --force-reset
+        echo "Database setup complete"
+
+    - name: Run tests with coverage
+      env:
+        DATABASE_URL: file:./test.db
+        JWT_SECRET: test-jwt-secret-for-ci-environment-32-chars-minimum
+        JWT_REFRESH_SECRET: test-refresh-secret-for-ci-environment-32-chars-minimum
+        NODE_ENV: test
+      run: npm run test:coverage
+
+    - name: Build for production
+      run: npm run build
+
+    - name: Stop test environment
+      run: docker compose down
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage/lcov.info
+        fail_ci_if_error: false
+
+    - name: Setup Pages
+      if: github.ref == 'refs/heads/main'
+      uses: actions/configure-pages@v5
+
+    - name: Upload coverage artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./coverage
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--prod'

@@ -5,6 +5,7 @@ import { config } from '../config';
 let prisma: PrismaClient;
 
 declare global {
+  // eslint-disable-next-line no-var, @typescript-eslint/no-unused-vars
   var __prisma: PrismaClient | undefined;
 }
 
