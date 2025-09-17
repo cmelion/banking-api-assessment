@@ -33,10 +33,10 @@ export async function generateStatement(
     success: true,
     data: {
       id: statement.id,
-      periodStart: statement.periodStart,
-      periodEnd: statement.periodEnd,
+      periodStart: statement.periodStart?.toISOString(),
+      periodEnd: statement.periodEnd?.toISOString(),
       fileUrl: statement.fileUrl,
-      createdAt: statement.createdAt,
+      createdAt: statement.createdAt?.toISOString(),
     },
   });
 }
@@ -57,11 +57,11 @@ export async function getStatement(
     success: true,
     data: {
       id: statement.id,
-      periodStart: statement.periodStart,
-      periodEnd: statement.periodEnd,
+      periodStart: statement.periodStart?.toISOString(),
+      periodEnd: statement.periodEnd?.toISOString(),
       fileUrl: statement.fileUrl,
       account: statement.account,
-      createdAt: statement.createdAt,
+      createdAt: statement.createdAt?.toISOString(),
     },
   });
 }

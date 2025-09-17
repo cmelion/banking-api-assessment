@@ -66,7 +66,22 @@ async function transferRoutes(fastify: FastifyInstance) {
                 },
               },
             },
-            meta: { type: 'object' },
+            meta: {
+              type: 'object',
+              properties: {
+                pagination: {
+                  type: 'object',
+                  properties: {
+                    page: { type: 'number' },
+                    limit: { type: 'number' },
+                    total: { type: 'number' },
+                    totalPages: { type: 'number' },
+                    hasNext: { type: 'boolean' },
+                    hasPrev: { type: 'boolean' },
+                  },
+                },
+              },
+            },
           },
         },
       },

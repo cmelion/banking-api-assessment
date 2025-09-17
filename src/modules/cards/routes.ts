@@ -18,12 +18,20 @@ async function cardRoutes(fastify: FastifyInstance) {
               type: 'object',
               properties: {
                 id: { type: 'string' },
-                type: { type: 'string' },
-                design: { type: 'string' },
-                maskedCardNumber: { type: 'string' },
-                expiryDate: { type: 'string' },
+                maskedPan: { type: 'string' },
+                brand: { type: 'string' },
+                last4: { type: 'string' },
+                expMonth: { type: 'number' },
+                expYear: { type: 'number' },
                 status: { type: 'string' },
-                account: { type: 'object' },
+                account: {
+                  type: 'object',
+                  properties: {
+                    accountNumber: { type: 'string' },
+                    type: { type: 'string' },
+                    currency: { type: 'string' }
+                  }
+                },
                 createdAt: { type: 'string' },
                 updatedAt: { type: 'string' },
               },
@@ -51,12 +59,20 @@ async function cardRoutes(fastify: FastifyInstance) {
               type: 'object',
               properties: {
                 id: { type: 'string' },
-                type: { type: 'string' },
-                design: { type: 'string' },
-                maskedCardNumber: { type: 'string' },
-                expiryDate: { type: 'string' },
+                maskedPan: { type: 'string' },
+                brand: { type: 'string' },
+                last4: { type: 'string' },
+                expMonth: { type: 'number' },
+                expYear: { type: 'number' },
                 status: { type: 'string' },
-                account: { type: 'object' },
+                account: {
+                  type: 'object',
+                  properties: {
+                    accountNumber: { type: 'string' },
+                    type: { type: 'string' },
+                    currency: { type: 'string' }
+                  }
+                },
                 updatedAt: { type: 'string' },
               },
             },
@@ -86,12 +102,20 @@ export async function accountCardRoutes(fastify: FastifyInstance) {
               type: 'object',
               properties: {
                 id: { type: 'string' },
-                type: { type: 'string' },
-                design: { type: 'string' },
-                maskedCardNumber: { type: 'string' },
-                expiryDate: { type: 'string' },
+                maskedPan: { type: 'string' },
+                brand: { type: 'string' },
+                last4: { type: 'string' },
+                expMonth: { type: 'number' },
+                expYear: { type: 'number' },
                 status: { type: 'string' },
-                account: { type: 'object' },
+                account: {
+                  type: 'object',
+                  properties: {
+                    accountNumber: { type: 'string' },
+                    type: { type: 'string' },
+                    currency: { type: 'string' }
+                  }
+                },
                 createdAt: { type: 'string' },
               },
             },
@@ -120,18 +144,41 @@ export async function accountCardRoutes(fastify: FastifyInstance) {
                 type: 'object',
                 properties: {
                   id: { type: 'string' },
-                  type: { type: 'string' },
-                  design: { type: 'string' },
-                  maskedCardNumber: { type: 'string' },
-                  expiryDate: { type: 'string' },
+                  maskedPan: { type: 'string' },
+                  brand: { type: 'string' },
+                  last4: { type: 'string' },
+                  expMonth: { type: 'number' },
+                  expYear: { type: 'number' },
                   status: { type: 'string' },
-                  account: { type: 'object' },
+                  account: {
+                  type: 'object',
+                  properties: {
+                    accountNumber: { type: 'string' },
+                    type: { type: 'string' },
+                    currency: { type: 'string' }
+                  }
+                },
                   createdAt: { type: 'string' },
                   updatedAt: { type: 'string' },
                 },
               },
             },
-            meta: { type: 'object' },
+            meta: {
+              type: 'object',
+              properties: {
+                pagination: {
+                  type: 'object',
+                  properties: {
+                    page: { type: 'number' },
+                    limit: { type: 'number' },
+                    total: { type: 'number' },
+                    totalPages: { type: 'number' },
+                    hasNext: { type: 'boolean' },
+                    hasPrev: { type: 'boolean' }
+                  }
+                }
+              }
+            },
           },
         },
       },

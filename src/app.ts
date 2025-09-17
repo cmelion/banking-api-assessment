@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from 'fastify';
+import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { serverConfig, apiConfig, features } from './config';
 
 // Plugins
@@ -8,7 +8,7 @@ import errorHandlerPlugin from './plugins/error-handler';
 
 export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify({
-    logger: true,
+    logger: process.env.NODE_ENV !== 'test',
     trustProxy: true,
     disableRequestLogging: true, // We handle this in our logging plugin
   });
@@ -32,7 +32,7 @@ export async function createApp(): Promise<FastifyInstance> {
   });
 
   // Add JWT verification decorator
-  app.decorate('authenticate', async function (request: any, reply: any) {
+  app.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
     try {
       await request.jwtVerify();
     } catch (err) {

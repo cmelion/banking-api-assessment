@@ -1,9 +1,17 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest } from 'fastify';
+
+// Type for request with custom properties
+type ExtendedRequest = FastifyRequest & {
+  correlationId?: string;
+  user?: { userId: string };
+};
 import fp from 'fastify-plugin';
 import { randomUUID } from 'crypto';
 // logConfig imported but used for future log configuration
 
 async function loggingPlugin(fastify: FastifyInstance) {
+  // Skip logging hooks during tests
+  const isTest = process.env.NODE_ENV === 'test';
 
   // Add correlation ID to all requests
   fastify.addHook('onRequest', async (request, reply) => {
@@ -12,38 +20,42 @@ async function loggingPlugin(fastify: FastifyInstance) {
     reply.header('x-correlation-id', correlationId);
 
     // Add to request context
-    (request as any).correlationId = correlationId;
+    (request as ExtendedRequest).correlationId = correlationId;
   });
 
-  // Log all requests
-  fastify.addHook('onRequest', async (request, _reply) => {
-    request.log.info({
-      correlationId: (request as any).correlationId,
-      userId: (request as any).user?.userId,
-    }, 'Request received');
-  });
+  if (!isTest) {
+    // Log all requests
+    fastify.addHook('onRequest', async (request, _reply) => {
+      request.log.info({
+        correlationId: (request as ExtendedRequest).correlationId,
+        userId: (request as ExtendedRequest).user?.userId,
+      }, 'Request received');
+    });
 
-  // Log all responses
-  fastify.addHook('onResponse', async (request, reply) => {
-    request.log.info({
-      correlationId: (request as any).correlationId,
-      userId: (request as any).user?.userId,
-      responseTime: reply.elapsedTime,
-      statusCode: reply.statusCode,
-    }, 'Request completed');
-  });
+    // Log all responses
+    fastify.addHook('onResponse', async (request, reply) => {
+      request.log.info({
+        correlationId: (request as ExtendedRequest).correlationId,
+        userId: (request as ExtendedRequest).user?.userId,
+        responseTime: reply.elapsedTime,
+        statusCode: reply.statusCode,
+      }, 'Request completed');
+    });
+  }
 
-  // Log errors
+  // Always log errors (even in tests)
   fastify.addHook('onError', async (request, reply, error) => {
-    request.log.error({
-      correlationId: (request as any).correlationId,
-      userId: (request as any).user?.userId,
-      error: {
-        message: error.message,
-        stack: error.stack,
-        code: (error as any).code,
-      },
-    }, 'Request error');
+    if (!isTest) {
+      request.log.error({
+        correlationId: (request as ExtendedRequest).correlationId,
+        userId: (request as ExtendedRequest).user?.userId,
+        error: {
+          message: error.message,
+          stack: error.stack,
+          code: (error as Error & { code?: string }).code,
+        },
+      }, 'Request error');
+    }
   });
 }
 

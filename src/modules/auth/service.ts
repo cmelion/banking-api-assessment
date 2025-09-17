@@ -4,9 +4,13 @@ import { prisma } from '../../db/connection';
 import { jwtConfig } from '../../config';
 import { AuthenticationError, ConflictError, ValidationError } from '../../lib/errors';
 import { AuthTokens, JwtPayload, UserRole } from '../../lib/types';
+import { User } from '@prisma/client';
+
+// User type for API responses (excluding sensitive fields)
+type SafeUser = Pick<User, 'id' | 'email' | 'name' | 'status' | 'createdAt'>;
 
 export class AuthService {
-  async signup(email: string, password: string, name: string): Promise<{ user: any; tokens: AuthTokens }> {
+  async signup(email: string, password: string, name: string): Promise<{ user: SafeUser; tokens: AuthTokens }> {
     // Validate input
     if (!email || !password || !name) {
       throw new ValidationError('Email, password, and name are required');
@@ -56,7 +60,7 @@ export class AuthService {
     return { user, tokens };
   }
 
-  async login(email: string, password: string): Promise<{ user: any; tokens: AuthTokens }> {
+  async login(email: string, password: string): Promise<{ user: SafeUser; tokens: AuthTokens }> {
     // Validate input
     if (!email || !password) {
       throw new ValidationError('Email and password are required');

@@ -14,6 +14,14 @@ if (config.NODE_ENV === 'production') {
   prisma = new PrismaClient({
     log: ['error', 'warn'],
   });
+} else if (config.NODE_ENV === 'test') {
+  // Quiet logging during tests
+  if (!global.__prisma) {
+    global.__prisma = new PrismaClient({
+      log: ['error'],
+    });
+  }
+  prisma = global.__prisma;
 } else {
   // Use global variable in development to prevent hot reload issues
   if (!global.__prisma) {
