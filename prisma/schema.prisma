@@ -7,8 +7,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")                 // Runtime connection (Prisma Accelerate pooled)
-  directUrl = env("DIRECT_URL")                   // Direct connection for migrations/seeding
+  url       = env("PRISMA_DATABASE_URL")          // Runtime connection (Prisma Accelerate pooled)
+  directUrl = env("POSTGRES_URL")                 // Direct connection for migrations/seeding
 }
 
 model User {
