@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/index.js",
-      "use": "@vercel/node"
+  "functions": {
+    "dist/index.js": {
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -17,10 +16,5 @@
     "DATABASE_URL": "@database_url",
     "JWT_SECRET": "@jwt_secret",
     "JWT_REFRESH_SECRET": "@jwt_refresh_secret"
-  },
-  "functions": {
-    "dist/index.js": {
-      "maxDuration": 30
-    }
   }
 }
