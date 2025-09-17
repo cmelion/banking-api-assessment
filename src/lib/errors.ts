@@ -3,9 +3,9 @@
 export class BaseError extends Error {
   public readonly statusCode: number;
   public readonly code: string;
-  public readonly details?: any;
+  public readonly details?: unknown;
 
-  constructor(message: string, statusCode: number, code: string, details?: any) {
+  constructor(message: string, statusCode: number, code: string, details?: unknown) {
     super(message);
     this.name = this.constructor.name;
     this.statusCode = statusCode;
@@ -17,7 +17,7 @@ export class BaseError extends Error {
 }
 
 export class ValidationError extends BaseError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super(message, 400, 'VALIDATION_ERROR', details);
   }
 }
@@ -41,13 +41,13 @@ export class NotFoundError extends BaseError {
 }
 
 export class ConflictError extends BaseError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super(message, 409, 'CONFLICT', details);
   }
 }
 
 export class BusinessError extends BaseError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super(message, 400, 'BUSINESS_ERROR', details);
   }
 }
@@ -81,18 +81,18 @@ export class RateLimitError extends BaseError {
 }
 
 export class InternalServerError extends BaseError {
-  constructor(message: string = 'Internal server error', details?: any) {
+  constructor(message: string = 'Internal server error', details?: unknown) {
     super(message, 500, 'INTERNAL_SERVER_ERROR', details);
   }
 }
 
 export class DatabaseError extends BaseError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super(message, 500, 'DATABASE_ERROR', details);
   }
 }
 
 // Error type guard
-export function isBaseError(error: any): error is BaseError {
+export function isBaseError(error: unknown): error is BaseError {
   return error instanceof BaseError;
 }

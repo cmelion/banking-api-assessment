@@ -31,6 +31,13 @@ module.exports = [
     },
   },
   {
+    files: ["**/*.test.{ts,js}", "**/tests/**/*.{ts,js}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+    },
+  },
+  {
     ignores: ["dist/", "node_modules/", "coverage/"],
   },
 ];

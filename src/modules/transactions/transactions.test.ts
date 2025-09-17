@@ -11,7 +11,7 @@ describe('Transaction Endpoints', () => {
   let accountId: string;
   let otherUserToken: string;
   let otherUserId: string;
-  let otherAccountId: string;
+  let _otherAccountId: string;
 
   // Helper function to create a user and get auth token
   async function createUserAndAccount(email: string, name: string) {
@@ -102,7 +102,7 @@ describe('Transaction Endpoints', () => {
     const otherUserData = await createUserAndAccount(otherEmail, 'Other User');
     otherUserToken = otherUserData.token;
     otherUserId = otherUserData.id;
-    otherAccountId = otherUserData.account;
+    _otherAccountId = otherUserData.account;
   });
 
   afterEach(async () => {
@@ -509,7 +509,7 @@ describe('Transaction Endpoints', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      const body = JSON.parse(response.body);
+      JSON.parse(response.body); // Parse but don't use in placeholder tests
 
       // Note: Current implementation may return empty objects
       // These tests should work when service is fully implemented:
@@ -552,7 +552,7 @@ describe('Transaction Endpoints', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      const body = JSON.parse(response.body);
+      JSON.parse(response.body); // Parse but don't use in placeholder tests
 
       // Note: Current implementation may return empty objects
       // These tests should work when service is fully implemented:

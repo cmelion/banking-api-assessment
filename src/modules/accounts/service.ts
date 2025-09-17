@@ -1,5 +1,6 @@
 import { Decimal } from '@prisma/client/runtime/library';
 import { prisma } from '../../db/connection';
+import { Account, Prisma } from '@prisma/client';
 import { ValidationError, NotFoundError, AuthorizationError, InternalServerError } from '../../lib/errors';
 import { AccountStatus, TransactionType } from '../../lib/types';
 import { CreateAccountRequest, UpdateAccountRequest } from './schemas';
@@ -11,7 +12,7 @@ export class AccountService {
     return prefix + randomPart;
   }
 
-  async createAccount(userId: string, data: CreateAccountRequest): Promise<any> {
+  async createAccount(userId: string, data: CreateAccountRequest): Promise<Account> {
     try {
       const accountNumber = this.generateAccountNumber();
 
@@ -42,8 +43,9 @@ export class AccountService {
 
         return account;
       });
-    } catch (error: any) {
-      if (error.code === 'P2002' && error.meta?.target?.includes('account_number')) {
+    } catch (error: unknown) {
+      const prismaError = error as { code?: string; meta?: { target?: string[] } };
+      if (prismaError.code === 'P2002' && prismaError.meta?.target?.includes('account_number')) {
         return this.createAccount(userId, data);
       }
       throw new InternalServerError('Failed to create account', error);
@@ -79,7 +81,7 @@ export class AccountService {
     const { page = 1, limit = 10, type, status } = options;
     const skip = (page - 1) * limit;
 
-    const where: any = {
+    const where: Prisma.AccountWhereInput = {
       ownerId: userId,
     };
 

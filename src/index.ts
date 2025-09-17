@@ -20,7 +20,7 @@ async function start() {
         app.log.info('Server shutdown complete');
         process.exit(0);
       } catch (error) {
-        app.log.error('Error during shutdown:', error as any);
+        app.log.error(error as Error, 'Error during shutdown');
         process.exit(1);
       }
     };

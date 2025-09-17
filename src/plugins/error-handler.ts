@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyError } from 'fastify';
+import { FastifyInstance, FastifyError, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 import { isBaseError } from '../lib/errors';
 import { features } from '../config';
@@ -7,7 +7,7 @@ import { ApiResponse } from '../lib/types';
 async function errorHandlerPlugin(fastify: FastifyInstance) {
   // Global error handler
   fastify.setErrorHandler(async (error: FastifyError, request, reply) => {
-    const correlationId = (request as any).correlationId;
+    const correlationId = (request as FastifyRequest & { correlationId?: string }).correlationId;
 
     // Log the error
     request.log.error({
@@ -27,7 +27,7 @@ async function errorHandlerPlugin(fastify: FastifyInstance) {
         error: {
           code: error.code,
           message: error.message,
-          ...(features.detailedErrors && error.details && { details: error.details }),
+          ...(features.detailedErrors && error.details ? { details: error.details } : {}),
         },
       };
 

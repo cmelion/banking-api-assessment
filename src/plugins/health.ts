@@ -25,7 +25,7 @@ async function healthPlugin(fastify: FastifyInstance) {
     try {
       checks.database = await checkDatabaseHealth();
     } catch (error) {
-      fastify.log.error('Database health check failed:', error as any);
+      fastify.log.error(error as Error, 'Database health check failed');
       checks.database = false;
     }
 
