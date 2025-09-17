@@ -41,15 +41,15 @@ jobs:
 
       - name: Generate Prisma client
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npx prisma generate
 
       - name: Apply migrations
         if: contains(github.event.inputs.action, 'migrate') || github.event.inputs.action == 'reset-and-seed'
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: |
           echo "🔄 Applying database migrations to ${{ github.event.inputs.environment }}..."
           if [ "${{ github.event.inputs.action }}" == "reset-and-seed" ]; then
@@ -63,8 +63,8 @@ jobs:
       - name: Seed database
         if: contains(github.event.inputs.action, 'seed')
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}  # Use direct connection for seeding
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          DATABASE_URL: ${{ secrets.DIRECT_URL }}  # Use direct connection for seeding
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: |
@@ -75,8 +75,8 @@ jobs:
 
       - name: Verify database health
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: |
           echo "🔍 Verifying database connectivity..."
           npx prisma db execute --stdin <<< "SELECT 1 as health_check;"
