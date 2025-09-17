@@ -152,7 +152,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
+    if: false # temporarily disable Vercel deployment from CI
 
     steps:
     - name: Checkout code

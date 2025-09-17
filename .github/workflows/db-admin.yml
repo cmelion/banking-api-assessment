@@ -40,6 +40,9 @@ jobs:
         run: npm ci
 
       - name: Generate Prisma client
+        env:
+          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
         run: npx prisma generate
 
       - name: Apply migrations
