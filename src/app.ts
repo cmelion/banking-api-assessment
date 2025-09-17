@@ -8,7 +8,7 @@ import errorHandlerPlugin from './plugins/error-handler';
 
 export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify({
-    logger: true,
+    logger: process.env.NODE_ENV !== 'test',
     trustProxy: true,
     disableRequestLogging: true, // We handle this in our logging plugin
   });
