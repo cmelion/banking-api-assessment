@@ -46,8 +46,8 @@ jobs:
       - name: Apply migrations
         if: contains(github.event.inputs.action, 'migrate') || github.event.inputs.action == 'reset-and-seed'
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          PRISMA_DATABASE_URL: ${{ secrets.PRISMA_DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
         run: |
           echo "🔄 Applying database migrations to ${{ github.event.inputs.environment }}..."
           if [ "${{ github.event.inputs.action }}" == "reset-and-seed" ]; then
@@ -61,8 +61,8 @@ jobs:
       - name: Seed database
         if: contains(github.event.inputs.action, 'seed')
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}  # Use direct connection for seeding
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          PRISMA_DATABASE_URL: ${{ secrets.POSTGRES_URL }}  # Use direct connection for seeding
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
         run: |
           echo "🌱 Seeding database in ${{ github.event.inputs.environment }}..."
           npm run db:seed
@@ -70,8 +70,8 @@ jobs:
 
       - name: Verify database health
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
-          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          PRISMA_DATABASE_URL: ${{ secrets.PRISMA_DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
         run: |
           echo "🔍 Verifying database connectivity..."
           npx prisma db execute --stdin <<< "SELECT 1 as health_check;"
