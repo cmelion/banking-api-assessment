@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "dist/app.vercel.js": {
-      "maxDuration": 30
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }
