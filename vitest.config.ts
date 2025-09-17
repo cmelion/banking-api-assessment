@@ -25,7 +25,10 @@ export default defineConfig({
         'src/db/seed.ts',
         'src/index.ts',
         'eslint.config.js',
-        'vitest.config.ts'
+        'vitest.config.ts',
+        // Exclude utility scripts and build artifacts
+        'api/**',
+        'scripts/**'
       ],
       thresholds: {
         global: {
