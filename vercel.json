@@ -1,5 +1,16 @@
 {
   "version": 2,
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index"
+    }
+  ],
   "env": {
     "NODE_ENV": "production"
   }
