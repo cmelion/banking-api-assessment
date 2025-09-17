@@ -10,8 +10,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - DATABASE_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
-      - DIRECT_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
+      - PRISMA_DATABASE_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
+      - POSTGRES_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
       - JWT_SECRET=your-development-jwt-secret-change-in-production
       - JWT_REFRESH_SECRET=your-development-refresh-secret-change-in-production
       - JWT_ACCESS_EXPIRY=15m
@@ -102,8 +102,8 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
-      - DATABASE_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
-      - DIRECT_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
+      - PRISMA_DATABASE_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
+      - POSTGRES_URL=postgresql://banking_user:banking_pass@postgres:5432/banking_db?schema=public
       - JWT_SECRET=your-development-jwt-secret-change-in-production
       - JWT_REFRESH_SECRET=your-development-refresh-secret-change-in-production
       - JWT_ACCESS_EXPIRY=15m
