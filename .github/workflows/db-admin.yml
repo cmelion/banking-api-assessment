@@ -1,0 +1,87 @@
+name: Database Administration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Vercel environment (production|preview)'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+      action:
+        description: 'Database operation to perform'
+        required: true
+        default: 'migrate-and-seed'
+        type: choice
+        options:
+          - migrate-only
+          - seed-only
+          - migrate-and-seed
+          - reset-and-seed
+
+jobs:
+  db-admin:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Apply migrations
+        if: contains(github.event.inputs.action, 'migrate') || github.event.inputs.action == 'reset-and-seed'
+        env:
+          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+        run: |
+          echo "🔄 Applying database migrations to ${{ github.event.inputs.environment }}..."
+          if [ "${{ github.event.inputs.action }}" == "reset-and-seed" ]; then
+            echo "⚠️  WARNING: Resetting database - all data will be lost!"
+            npx prisma migrate reset --force
+          else
+            npx prisma migrate deploy
+          fi
+          echo "✅ Migrations completed"
+
+      - name: Seed database
+        if: contains(github.event.inputs.action, 'seed')
+        env:
+          DATABASE_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}  # Use direct connection for seeding
+          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+        run: |
+          echo "🌱 Seeding database in ${{ github.event.inputs.environment }}..."
+          npm run db:seed
+          echo "✅ Database seeded successfully"
+
+      - name: Verify database health
+        env:
+          DATABASE_URL: ${{ secrets.POSTGRES_PRISMA_URL }}
+          DIRECT_URL: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+        run: |
+          echo "🔍 Verifying database connectivity..."
+          npx prisma db execute --stdin <<< "SELECT 1 as health_check;"
+          echo "✅ Database is healthy"
+
+      - name: Log operation summary
+        run: |
+          echo "📝 Database operation summary:"
+          echo "  - Environment: ${{ github.event.inputs.environment }}"
+          echo "  - Action: ${{ github.event.inputs.action }}"
+          echo "  - Triggered by: ${{ github.actor }}"
+          echo "  - Commit: ${{ github.sha }}"
+          echo "  - Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"

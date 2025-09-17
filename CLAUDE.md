@@ -10,7 +10,7 @@ This is a production-ready banking REST service assessment built with AI-assiste
 
 - **Runtime**: Node.js (LTS) with TypeScript
 - **Web Framework**: Fastify (high performance, built-in schema validation)
-- **Database**: Prisma ORM with SQLite (development) with upgrade path to PostgreSQL
+- **Database**: Prisma ORM with PostgreSQL (local development & production)
 - **Validation**: JSON schemas with Fastify integration
 - **Authentication**: JWT (access + refresh tokens), Argon2id password hashing
 - **Logging**: Pino (structured JSON logs with correlation IDs)
@@ -55,7 +55,7 @@ docker-compose down     # Stop all services
 │   ├── index.ts               # Server bootstrap
 │   ├── config/index.ts        # Environment schema, config loader
 │   ├── db/
-│   │   ├── schema.prisma      # Prisma schema (SQLite)
+│   │   ├── schema.prisma      # Prisma schema (PostgreSQL)
 │   │   └── migrate.ts         # Migration runner
 │   ├── modules/
 │   │   ├── auth/              # Authentication & authorization
@@ -180,6 +180,37 @@ When using AI assistance:
 
 ### 🛠️ Development Optimizations for Claude
 
+#### PostgreSQL Migration (Completed)
+
+This project has been successfully migrated from SQLite to PostgreSQL for better Vercel deployment compatibility:
+
+**Migration Changes:**
+- **Database Provider**: Changed Prisma datasource from `sqlite` to `postgresql`
+- **Environment Variables**: Added `DIRECT_URL` for migrations alongside `DATABASE_URL` for runtime
+- **Docker Configuration**: Updated to use PostgreSQL container with health checks
+- **CI/CD**: GitHub Actions now run tests against PostgreSQL services
+- **Seed Script**: Enhanced to create initial test data automatically
+
+**Local Development Setup:**
+```bash
+# Start PostgreSQL with Docker
+docker-compose up -d postgres
+
+# Apply migrations and seed data
+npm run db:migrate
+npm run db:seed
+
+# Start development server
+npm run dev
+```
+
+**Production (Vercel):**
+- Add Vercel Postgres integration
+- Set environment variables:
+  - `DATABASE_URL` = `${POSTGRES_PRISMA_URL}` (pooled)
+  - `DIRECT_URL` = `${POSTGRES_URL_NON_POOLING}` (direct)
+- Use GitHub Actions workflow `DB Admin` for migrations and seeding
+
 #### Common Commands
 ```bash
 # Quick Development Setup
@@ -208,9 +239,10 @@ npm run typecheck        # TypeScript compilation check
 #### Fixed Issues Documentation
 1. **Prisma Alpine Compatibility**: Set `binaryTargets = ["native", "linux-musl-openssl-3.0.x"]`
 2. **Docker OpenSSL**: Use `openssl ca-certificates` packages for Alpine Linux
-3. **Database Configuration**: SQLite file path must be `file:/app/data/banking.db` in Docker
+3. **PostgreSQL Configuration**: Use proper connection strings with `?schema=public` parameter
 4. **Test Timeouts**: Set `testTimeout: 10000` in vitest.config.ts to prevent hangs
 5. **Status Codes**: Auth signup returns `201` not `200` for new user creation
+6. **PostgreSQL Migration**: Remove old migration directory when switching providers
 
 #### API Endpoint Verification Status
 - ✅ `POST /api/v1/auth/signup` - Creates user and returns tokens

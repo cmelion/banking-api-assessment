@@ -19,6 +19,25 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: banking_db
+          POSTGRES_USER: banking_user
+          POSTGRES_PASSWORD: banking_pass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U banking_user -d banking_db"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://banking_user:banking_pass@localhost:5432/banking_db?schema=public
+      DIRECT_URL: postgresql://banking_user:banking_pass@localhost:5432/banking_db?schema=public
+      JWT_SECRET: test-jwt-secret-for-ci-environment-32-chars-minimum
+      JWT_REFRESH_SECRET: test-refresh-secret-for-ci-environment-32-chars-minimum
+      NODE_ENV: test
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -26,11 +45,14 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
 
     - name: Install dependencies
       run: npm ci
+
+    - name: Generate Prisma client
+      run: npx prisma generate
 
     - name: Run TypeScript check
       run: npm run typecheck
@@ -39,20 +61,13 @@ jobs:
       run: npm run lint
 
     - name: Setup test database
-      env:
-        DATABASE_URL: file:./ci-test.db
-        JWT_SECRET: test-jwt-secret-for-ci-environment-32-chars-minimum
-        NODE_ENV: test
       run: |
-        echo "Setting up test database..."
-        npx prisma db push --force-reset
+        echo "Setting up PostgreSQL test database..."
+        npx prisma migrate deploy
+        npm run db:seed
         echo "Database setup complete"
 
     - name: Run tests with coverage
-      env:
-        DATABASE_URL: file:./ci-test.db
-        JWT_SECRET: test-jwt-secret-for-ci-environment-32-chars-minimum
-        NODE_ENV: test
       run: |
         echo "🧪 Running test suite with coverage..."
         npm run test:coverage
