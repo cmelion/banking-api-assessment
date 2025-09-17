@@ -149,7 +149,7 @@ POST   /api/v1/transfers             # Money transfer
 ```http
 POST   /api/v1/accounts/:id/cards    # Issue card (mock)
 GET    /api/v1/accounts/:id/cards    # List cards (masked)
-POST   /api/v1/accounts/:id/statements:generate  # Generate statement
+POST   /api/v1/accounts/:id/statements/generate  # Generate statement
 GET    /api/v1/statements/:id        # Download statement
 ```
 
@@ -248,6 +248,9 @@ npx vitest src/modules/auth/auth.test.ts
 npm run test:watch
 ```
 
+Coverage report:
+- https://cmelion.github.io/banking-api-assessment
+
 ### Test Database
 
 Tests use a separate PostgreSQL database that is automatically:
@@ -271,7 +274,7 @@ The seed script creates test users and accounts for development:
 docker build -t banking-api .
 
 # Run with docker-compose
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose up -d
 ```
 
 ### Environment Variables
