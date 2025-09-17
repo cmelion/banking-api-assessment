@@ -25,6 +25,10 @@ describe('Transaction Endpoints', () => {
       },
     });
 
+    if (signupResponse.statusCode !== 201) {
+      throw new Error(`Signup failed for ${email}: ${signupResponse.body}`);
+    }
+
     const signupBody = JSON.parse(signupResponse.body);
     const token = signupBody.data.tokens.accessToken;
     const id = signupBody.data.user.id;

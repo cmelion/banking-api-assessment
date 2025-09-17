@@ -19,7 +19,7 @@ describe('Cards Module', () => {
     prisma = new PrismaClient();
 
     // Create primary test user
-    const uniqueEmail = `test-${Date.now()}@example.com`;
+    const uniqueEmail = `test-${Date.now()}-${Math.random().toString(36).substring(2)}@example.com`;
     const signupResponse = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/signup',
@@ -29,6 +29,10 @@ describe('Cards Module', () => {
         name: 'Card Test User',
       },
     });
+
+    if (signupResponse.statusCode !== 201) {
+      throw new Error(`Primary user signup failed: ${signupResponse.body}`);
+    }
 
     const signupBody = JSON.parse(signupResponse.body);
     authToken = signupBody.data.tokens.accessToken;
@@ -50,7 +54,7 @@ describe('Cards Module', () => {
     accountId = accountBody.data.id;
 
     // Create second test user for authorization tests
-    const otherEmail = `other-${Date.now()}@example.com`;
+    const otherEmail = `other-${Date.now()}-${Math.random().toString(36).substring(2)}@example.com`;
     const otherSignupResponse = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/signup',
@@ -60,6 +64,10 @@ describe('Cards Module', () => {
         name: 'Other Test User',
       },
     });
+
+    if (otherSignupResponse.statusCode !== 201) {
+      throw new Error(`Other user signup failed: ${otherSignupResponse.body}`);
+    }
 
     const otherSignupBody = JSON.parse(otherSignupResponse.body);
     otherUserToken = otherSignupBody.data.tokens.accessToken;
@@ -112,7 +120,12 @@ describe('Cards Module', () => {
       }
 
       await prisma.account.deleteMany({ where: { ownerId: userId } });
-      await prisma.user.delete({ where: { id: userId } });
+      try {
+        await prisma.user.delete({ where: { id: userId } });
+      } catch (error) {
+        // User may not exist if signup failed
+        console.log('Warning: Could not delete user during cleanup:', error);
+      }
     }
 
     if (otherUserId) {
@@ -142,7 +155,12 @@ describe('Cards Module', () => {
       }
 
       await prisma.account.deleteMany({ where: { ownerId: otherUserId } });
-      await prisma.user.delete({ where: { id: otherUserId } });
+      try {
+        await prisma.user.delete({ where: { id: otherUserId } });
+      } catch (error) {
+        // User may not exist if signup failed
+        console.log('Warning: Could not delete other user during cleanup:', error);
+      }
     }
 
     await prisma.$disconnect();

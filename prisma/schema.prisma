@@ -1,107 +1,95 @@
-// Banking API Prisma Schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")                 // Runtime connection (Prisma Accelerate pooled)
-  directUrl = env("DIRECT_URL")                   // Direct connection for migrations/seeding
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  passwordHash String  @map("password_hash")
-  name        String
-  status      String   @default("ACTIVE")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  accounts       Account[]
-  refreshTokens  RefreshToken[]
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String         @map("password_hash")
+  name          String
+  status        String         @default("ACTIVE")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  accounts      Account[]
+  refreshTokens RefreshToken[]
 
   @@map("users")
 }
 
 model Account {
-  id            String      @id @default(cuid())
-  accountNumber String      @unique @map("account_number")
+  id            String        @id @default(cuid())
+  accountNumber String        @unique @map("account_number")
   type          String
-  currency      String      @default("USD")
-  balance       Decimal     @default(0)
-  ownerId       String      @map("owner_id")
-  status        String      @default("ACTIVE")
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-
-  // Relations
+  currency      String        @default("USD")
+  balance       Decimal       @default(0)
+  ownerId       String        @map("owner_id")
+  status        String        @default("ACTIVE")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
   owner         User          @relation(fields: [ownerId], references: [id])
+  cards         Card[]
+  statements    Statement[]
   transactions  Transaction[]
   transfersFrom Transfer[]    @relation("FromAccount")
   transfersTo   Transfer[]    @relation("ToAccount")
-  cards         Card[]
-  statements    Statement[]
 
   @@map("accounts")
 }
 
 model Transaction {
-  id           String            @id @default(cuid())
-  accountId    String            @map("account_id")
+  id           String    @id @default(cuid())
+  accountId    String    @map("account_id")
   type         String
   amount       Decimal
-  currency     String            @default("USD")
+  currency     String    @default("USD")
   description  String?
   counterparty String?
-  transferId   String?           @map("transfer_id")
-  balanceAfter Decimal           @map("balance_after")
-  createdAt    DateTime          @default(now()) @map("created_at")
-
-  // Relations
-  account      Account           @relation(fields: [accountId], references: [id])
-  transfer     Transfer?         @relation(fields: [transferId], references: [id])
+  transferId   String?   @map("transfer_id")
+  balanceAfter Decimal   @map("balance_after")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  account      Account   @relation(fields: [accountId], references: [id])
+  transfer     Transfer? @relation(fields: [transferId], references: [id])
 
   @@map("transactions")
 }
 
 model Transfer {
-  id            String         @id @default(cuid())
-  fromAccountId String         @map("from_account_id")
-  toAccountId   String         @map("to_account_id")
-  amount        Decimal
-  currency      String         @default("USD")
-  description   String?
-  status        String         @default("PENDING")
+  id             String        @id @default(cuid())
+  fromAccountId  String        @map("from_account_id")
+  toAccountId    String        @map("to_account_id")
+  amount         Decimal
+  currency       String        @default("USD")
+  description    String?
+  status         String        @default("PENDING")
   idempotencyKey String?       @unique @map("idempotency_key")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-
-  // Relations
-  fromAccount   Account        @relation("FromAccount", fields: [fromAccountId], references: [id])
-  toAccount     Account        @relation("ToAccount", fields: [toAccountId], references: [id])
-  transactions  Transaction[]
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  transactions   Transaction[]
+  fromAccount    Account       @relation("FromAccount", fields: [fromAccountId], references: [id])
+  toAccount      Account       @relation("ToAccount", fields: [toAccountId], references: [id])
 
   @@map("transfers")
 }
 
 model Card {
-  id        String     @id @default(cuid())
-  accountId String     @map("account_id")
-  maskedPan String     @map("masked_pan")
+  id        String   @id @default(cuid())
+  accountId String   @map("account_id")
+  maskedPan String   @map("masked_pan")
   brand     String
   last4     String
-  expMonth  Int        @map("exp_month")
-  expYear   Int        @map("exp_year")
-  status    String     @default("ACTIVE")
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-
-  // Relations
-  account   Account    @relation(fields: [accountId], references: [id])
+  expMonth  Int      @map("exp_month")
+  expYear   Int      @map("exp_year")
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  account   Account  @relation(fields: [accountId], references: [id])
 
   @@map("cards")
 }
@@ -113,8 +101,6 @@ model Statement {
   periodEnd   DateTime @map("period_end")
   fileUrl     String?  @map("file_url")
   createdAt   DateTime @default(now()) @map("created_at")
-
-  // Relations
   account     Account  @relation(fields: [accountId], references: [id])
 
   @@map("statements")
@@ -127,8 +113,6 @@ model RefreshToken {
   expiresAt DateTime  @map("expires_at")
   revokedAt DateTime? @map("revoked_at")
   createdAt DateTime  @default(now()) @map("created_at")
-
-  // Relations
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
@@ -143,12 +127,3 @@ model IdempotencyKey {
 
   @@map("idempotency_keys")
 }
-
-// Enums are implemented as string constants in TypeScript
-// Valid values:
-// UserStatus: ACTIVE, INACTIVE, SUSPENDED
-// AccountType: CHECKING, SAVINGS, CREDIT
-// AccountStatus: ACTIVE, INACTIVE, FROZEN, CLOSED
-// TransactionType: DEBIT, CREDIT
-// TransferStatus: PENDING, COMPLETED, FAILED, CANCELLED
-// CardStatus: ACTIVE, INACTIVE, BLOCKED, EXPIRED

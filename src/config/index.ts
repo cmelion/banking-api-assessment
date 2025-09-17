@@ -11,7 +11,8 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 
   // Database
-  PRISMA_DATABASE_URL: z.string().min(1, 'PRISMA_DATABASE_URL is required'),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  DIRECT_URL: z.string().optional(),
 
   // JWT Configuration
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
@@ -38,7 +39,7 @@ export const config = envValidation.data;
 
 // Database configuration
 export const dbConfig = {
-  url: config.PRISMA_DATABASE_URL,
+  url: config.DATABASE_URL,
   // Add connection pool settings if needed
 };
 

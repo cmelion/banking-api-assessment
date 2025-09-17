@@ -25,7 +25,7 @@ describe('Statements Module', () => {
     accountService = new AccountService();
 
     // Create first test user and get auth token
-    testEmail1 = `testuser1-${Date.now()}@example.com`;
+    testEmail1 = `testuser1-${Date.now()}-${Math.random().toString(36).substring(2)}@example.com`;
     const signupResponse1 = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/signup',
@@ -45,7 +45,7 @@ describe('Statements Module', () => {
     userId1 = signupBody1.data.user.id;
 
     // Create second test user and get auth token
-    testEmail2 = `testuser2-${Date.now()}@example.com`;
+    testEmail2 = `testuser2-${Date.now()}-${Math.random().toString(36).substring(2)}@example.com`;
     const signupResponse2 = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/signup',
