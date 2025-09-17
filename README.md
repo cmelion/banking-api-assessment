@@ -66,6 +66,47 @@ docker-compose up -d
 # Adminer (DB admin) at http://localhost:8080
 ```
 
+### Docker Services Provided
+
+The Docker Compose configuration provides a complete containerized development environment:
+
+**Core Services:**
+- **banking-api** - Main API server (port 3000) with health checks and auto-restart
+- **postgres** - PostgreSQL 16 database with persistent storage and health monitoring
+- **redis** - Redis cache/session store with persistent storage
+- **adminer** - Web-based database administration interface (port 8080)
+
+**Development Features:**
+- **banking-api-dev** - Debug-enabled container for WebStorm development (port 3001, debug port 9229)
+- **Custom networking** - Isolated bridge network for service communication
+- **Volume persistence** - Data survives container restarts
+- **Health monitoring** - Comprehensive health checks ensure service reliability
+- **Dependency management** - Services start in correct order with health verification
+
+**Development Workflow Options:**
+
+1. **Hybrid Development** (Recommended for active development):
+   ```bash
+   # Start only infrastructure services
+   docker-compose up -d postgres redis adminer
+   
+   # Run API locally for hot reload
+   npm run dev
+   ```
+
+2. **Full Docker Development**:
+   ```bash
+   # Start everything including API
+   docker-compose up -d
+   ```
+
+3. **Debug Mode** (WebStorm/IDE debugging):
+   ```bash
+   # Start with debug profile
+   docker-compose --profile dev up -d
+   # API available at http://localhost:3001 with debug port 9229
+   ```
+
 ## 🛠️ Technology Stack
 
 ### Core Framework
@@ -149,7 +190,7 @@ POST   /api/v1/transfers             # Money transfer
 ```http
 POST   /api/v1/accounts/:id/cards    # Issue card (mock)
 GET    /api/v1/accounts/:id/cards    # List cards (masked)
-POST   /api/v1/accounts/:id/statements:generate  # Generate statement
+POST   /api/v1/accounts/:id/statements/generate  # Generate statement
 GET    /api/v1/statements/:id        # Download statement
 ```
 
@@ -248,6 +289,9 @@ npx vitest src/modules/auth/auth.test.ts
 npm run test:watch
 ```
 
+Coverage report:
+- https://cmelion.github.io/banking-api-assessment
+
 ### Test Database
 
 Tests use a separate PostgreSQL database that is automatically:
@@ -271,7 +315,7 @@ The seed script creates test users and accounts for development:
 docker build -t banking-api .
 
 # Run with docker-compose
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose up -d
 ```
 
 ### Environment Variables
