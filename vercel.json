@@ -1,16 +1,10 @@
 {
   "version": 2,
   "functions": {
-    "dist/index.js": {
+    "dist/app.vercel.js": {
       "maxDuration": 30
     }
   },
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/index.js"
-    }
-  ],
   "env": {
     "NODE_ENV": "production"
   }
