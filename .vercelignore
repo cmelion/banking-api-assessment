@@ -1,0 +1,14 @@
+node_modules
+.env
+.env.local
+.git
+*.test.ts
+*.test.js
+coverage
+.nyc_output
+tests
+docs/AI_USAGE.md
+docker-compose.yml
+Dockerfile
+*.md
+!README.md

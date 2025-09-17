@@ -1,23 +1,48 @@
 import { prisma } from './connection';
 import { Prisma } from '@prisma/client';
+import * as argon2 from 'argon2';
 
 async function main() {
   console.log('🌱 Starting database seeding...');
 
-  // Find the existing test user
-  const testUser = await prisma.user.findUnique({
+  // Find or create the test user
+  let testUser = await prisma.user.findUnique({
     where: { email: 'test@example.com' }
   });
 
   if (!testUser) {
-    console.log('❌ Test user not found. Please run authentication tests first.');
-    return;
+    console.log('👤 Creating test user...');
+    const hashedPassword = await argon2.hash('password123');
+    testUser = await prisma.user.create({
+      data: {
+        email: 'test@example.com',
+        passwordHash: hashedPassword,
+        name: 'Test User',
+        status: 'ACTIVE'
+      }
+    });
+    console.log('✅ Test user created successfully');
   }
 
   // Find or create test accounts
-  const checkingAccount = await prisma.account.findFirst({
-    where: { ownerId: testUser.id }
+  let checkingAccount = await prisma.account.findFirst({
+    where: { ownerId: testUser.id, type: 'CHECKING' }
   });
+
+  if (!checkingAccount) {
+    console.log('🏦 Creating checking account...');
+    checkingAccount = await prisma.account.create({
+      data: {
+        accountNumber: `1000${Math.floor(Math.random() * 1000000000).toString().padStart(9, '0')}`,
+        type: 'CHECKING',
+        currency: 'USD',
+        balance: new Prisma.Decimal(1000),
+        ownerId: testUser.id,
+        status: 'ACTIVE'
+      }
+    });
+    console.log(`✅ Created checking account: ${checkingAccount.accountNumber}`);
+  }
 
   let savingsAccount = await prisma.account.findFirst({
     where: { ownerId: testUser.id, type: 'SAVINGS' }
@@ -54,11 +79,6 @@ async function main() {
       }
     });
     console.log(`✅ Created credit account: ${creditAccount.accountNumber}`);
-  }
-
-  if (!checkingAccount) {
-    console.log('❌ Checking account not found');
-    return;
   }
 
   // Sample transactions for the checking account
