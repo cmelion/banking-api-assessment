@@ -63,6 +63,8 @@ jobs:
         env:
           PRISMA_DATABASE_URL: ${{ secrets.POSTGRES_URL }}  # Use direct connection for seeding
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: |
           echo "🌱 Seeding database in ${{ github.event.inputs.environment }}..."
           npm run db:seed
