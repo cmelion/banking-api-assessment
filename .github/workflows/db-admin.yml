@@ -45,8 +45,8 @@ jobs:
       - name: Apply migrations
         if: contains(github.event.inputs.action, 'migrate') || github.event.inputs.action == 'reset-and-seed'
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          PRISMA_DATABASE_URL: ${{ secrets.PRISMA_DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
         run: |
           echo "🔄 Applying database migrations to ${{ github.event.inputs.environment }}..."
           if [ "${{ github.event.inputs.action }}" == "reset-and-seed" ]; then
@@ -60,8 +60,8 @@ jobs:
       - name: Seed database
         if: contains(github.event.inputs.action, 'seed')
         env:
-          DATABASE_URL: ${{ secrets.DIRECT_URL }}  # Use direct connection for seeding
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          PRISMA_DATABASE_URL: ${{ secrets.POSTGRES_URL }}  # Use direct connection for seeding
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: |
