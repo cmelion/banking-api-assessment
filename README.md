@@ -66,6 +66,47 @@ docker-compose up -d
 # Adminer (DB admin) at http://localhost:8080
 ```
 
+### Docker Services Provided
+
+The Docker Compose configuration provides a complete containerized development environment:
+
+**Core Services:**
+- **banking-api** - Main API server (port 3000) with health checks and auto-restart
+- **postgres** - PostgreSQL 16 database with persistent storage and health monitoring
+- **redis** - Redis cache/session store with persistent storage
+- **adminer** - Web-based database administration interface (port 8080)
+
+**Development Features:**
+- **banking-api-dev** - Debug-enabled container for WebStorm development (port 3001, debug port 9229)
+- **Custom networking** - Isolated bridge network for service communication
+- **Volume persistence** - Data survives container restarts
+- **Health monitoring** - Comprehensive health checks ensure service reliability
+- **Dependency management** - Services start in correct order with health verification
+
+**Development Workflow Options:**
+
+1. **Hybrid Development** (Recommended for active development):
+   ```bash
+   # Start only infrastructure services
+   docker-compose up -d postgres redis adminer
+   
+   # Run API locally for hot reload
+   npm run dev
+   ```
+
+2. **Full Docker Development**:
+   ```bash
+   # Start everything including API
+   docker-compose up -d
+   ```
+
+3. **Debug Mode** (WebStorm/IDE debugging):
+   ```bash
+   # Start with debug profile
+   docker-compose --profile dev up -d
+   # API available at http://localhost:3001 with debug port 9229
+   ```
+
 ## 🛠️ Technology Stack
 
 ### Core Framework
