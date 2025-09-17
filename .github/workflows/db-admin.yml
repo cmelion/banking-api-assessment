@@ -66,6 +66,7 @@ jobs:
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: |
           echo "🌱 Seeding database in ${{ github.event.inputs.environment }}..."
+          echo "JWT_SECRET length: ${#JWT_SECRET}"
           npm run db:seed
           echo "✅ Database seeded successfully"
 
