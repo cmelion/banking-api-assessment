@@ -74,7 +74,7 @@ export const apiConfig = {
 
 // Feature flags
 export const features = {
-  swaggerDocs: config.NODE_ENV === 'development',
+  swaggerDocs: true, // Enable in all environments for this exercise
   detailedErrors: config.NODE_ENV === 'development',
 };
 

@@ -153,9 +153,25 @@ src/
 
 ## 📚 API Documentation
 
+### Live Deployment
+
+🌐 **Production API**: [https://banking-api-assessment.vercel.app](https://banking-api-assessment.vercel.app)
+
+🖥️ **Banking Client**: [https://banking-client-nine.vercel.app](https://banking-client-nine.vercel.app)
+
+**Public Endpoints** (no authentication required):
+- Health Check: [https://banking-api-assessment.vercel.app/health](https://banking-api-assessment.vercel.app/health)
+- Readiness Check: [https://banking-api-assessment.vercel.app/ready](https://banking-api-assessment.vercel.app/ready)
+
 ### Base URL
-- Development: `http://localhost:3000/api/v1`
-- Swagger UI: `http://localhost:3000/docs`
+- **Production**: `https://banking-api-assessment.vercel.app/api/v1`
+- **Development**: `http://localhost:3000/api/v1`
+
+### API Documentation
+- **Production Swagger UI**: [https://banking-api-assessment.vercel.app/docs](https://banking-api-assessment.vercel.app/docs)
+- **Development Swagger UI**: `http://localhost:3000/docs`
+
+> ⚠️ **Security Note**: Swagger documentation is enabled in production for ease of review. In a real production environment, API documentation should typically be disabled or secured to prevent information disclosure.
 
 ### Core Endpoints
 
