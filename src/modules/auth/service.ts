@@ -37,27 +37,49 @@ export class AuthService {
       parallelism: 4,
     });
 
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        name,
-        status: 'ACTIVE',
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        status: true,
-        createdAt: true,
-      },
+    // Create user and default checking account in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Create user
+      const user = await tx.user.create({
+        data: {
+          email,
+          passwordHash,
+          name,
+          status: 'ACTIVE',
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          status: true,
+          createdAt: true,
+        },
+      });
+
+      // Generate account number
+      const prefix = '1000';
+      const randomPart = Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+      const accountNumber = prefix + randomPart;
+
+      // Create default checking account with $0 balance
+      await tx.account.create({
+        data: {
+          accountNumber,
+          type: 'CHECKING',
+          currency: 'USD',
+          balance: 0,
+          ownerId: user.id,
+          status: 'ACTIVE',
+        },
+      });
+
+      return user;
     });
 
     // Generate tokens
-    const tokens = await this.generateTokens(user.id, user.email);
+    const tokens = await this.generateTokens(result.id, result.email);
 
-    return { user, tokens };
+    return { user: result, tokens };
   }
 
   async login(email: string, password: string): Promise<{ user: SafeUser; tokens: AuthTokens }> {
