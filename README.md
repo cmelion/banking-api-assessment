@@ -161,7 +161,7 @@ src/
 
 **Demo Video:**
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/-z9d9ayu01s?si=uGeyLRFfoWkOosRW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Watch the video](https://github.com/user-attachments/assets/0f9564d9-cb19-422e-aad1-ea07c2069d6f)](https://www.youtube.com/watch?v=-z9d9ayu01s)
 
 **Public Endpoints** (no authentication required):
 - Health Check: [https://banking-api-assessment.vercel.app/health](https://banking-api-assessment.vercel.app/health)
