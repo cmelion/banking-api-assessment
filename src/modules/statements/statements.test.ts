@@ -32,7 +32,8 @@ describe('Statements Module', () => {
       payload: {
         email: testEmail1,
         password: 'SecurePassword123',
-        name: 'Test User 1',
+        firstName: 'Test',
+        lastName: 'User1',
       },
     });
 
@@ -52,7 +53,8 @@ describe('Statements Module', () => {
       payload: {
         email: testEmail2,
         password: 'SecurePassword123',
-        name: 'Test User 2',
+        firstName: 'Test',
+        lastName: 'User2',
       },
     });
 

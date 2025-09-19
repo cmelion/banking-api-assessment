@@ -22,7 +22,8 @@ describe('Account Lifecycle Integration Tests', () => {
       payload: {
         email: uniqueEmail,
         password: 'SecurePassword123',
-        name: 'Integration Test User',
+        firstName: 'Integration',
+        lastName: 'User',
       },
     });
 
@@ -245,24 +246,34 @@ describe('Account Lifecycle Integration Tests', () => {
     });
 
     it('should handle multiple account types and their interactions', async () => {
-      // Create checking, savings, and credit accounts
+      // Create a fresh user for this test to avoid interference
+      const multiTestEmail = `multi-test-${Date.now()}@example.com`;
+      const signupResponse = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/signup',
+        payload: {
+          email: multiTestEmail,
+          password: 'SecurePassword123',
+          firstName: 'Multi',
+          lastName: 'User',
+        },
+      });
+
+      const signupBody = JSON.parse(signupResponse.body);
+      const multiTestToken = signupBody.data.tokens.accessToken;
+
+      // Create savings and credit accounts (checking already auto-created)
       const accounts = await Promise.all([
         app.inject({
           method: 'POST',
           url: '/api/v1/accounts',
-          headers: { Authorization: `Bearer ${authToken}` },
-          payload: { type: 'CHECKING', currency: 'USD', initialDeposit: 2000 },
-        }),
-        app.inject({
-          method: 'POST',
-          url: '/api/v1/accounts',
-          headers: { Authorization: `Bearer ${authToken}` },
+          headers: { Authorization: `Bearer ${multiTestToken}` },
           payload: { type: 'SAVINGS', currency: 'USD', initialDeposit: 5000 },
         }),
         app.inject({
           method: 'POST',
           url: '/api/v1/accounts',
-          headers: { Authorization: `Bearer ${authToken}` },
+          headers: { Authorization: `Bearer ${multiTestToken}` },
           payload: { type: 'CREDIT', currency: 'USD' },
         })
       ]);
@@ -272,10 +283,9 @@ describe('Account Lifecycle Integration Tests', () => {
         expect(response.statusCode).toBe(201);
       });
 
-      const [checkingData, savingsData, creditData] = accounts.map(r => JSON.parse(r.body).data);
+      const [savingsData, creditData] = accounts.map(r => JSON.parse(r.body).data);
 
       // Verify account balances
-      expect(checkingData.balance).toBe('2000');
       expect(savingsData.balance).toBe('5000');
       expect(creditData.balance).toBe('0');
 
@@ -283,27 +293,31 @@ describe('Account Lifecycle Integration Tests', () => {
       const listResponse = await app.inject({
         method: 'GET',
         url: '/api/v1/accounts',
-        headers: { Authorization: `Bearer ${authToken}` },
+        headers: { Authorization: `Bearer ${multiTestToken}` },
       });
 
       expect(listResponse.statusCode).toBe(200);
       const accountsList = JSON.parse(listResponse.body).data;
-      expect(accountsList).toHaveLength(3);
+      expect(accountsList).toHaveLength(3); // 1 auto-created checking + 2 manually created
 
       const accountTypes = accountsList.map((acc: any) => acc.type).sort();
-      expect(accountTypes).toEqual(['CHECKING', 'CREDIT', 'SAVINGS']);
+      expect(accountTypes).toEqual(['CHECKING', 'CREDIT', 'SAVINGS']); // 1 auto checking + manual savings & credit
+
+      // Find the auto-created checking account for transfer testing
+      const checkingAccount = accountsList.find((acc: any) => acc.type === 'CHECKING');
+      expect(checkingAccount).toBeDefined();
 
       // Test cross-account transfers
       const savingsToCheckingTransfer = await app.inject({
         method: 'POST',
         url: '/api/v1/transfers',
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${multiTestToken}`,
           'Idempotency-Key': `multi-account-transfer-${Date.now()}`
         },
         payload: {
           fromAccountId: savingsData.id,
-          toAccountId: checkingData.id,
+          toAccountId: checkingAccount.id,
           amount: 1000.00,
           currency: 'USD',
           description: 'Savings to checking transfer'
@@ -316,17 +330,17 @@ describe('Account Lifecycle Integration Tests', () => {
       const finalSavingsBalance = await app.inject({
         method: 'GET',
         url: `/api/v1/accounts/${savingsData.id}/balance`,
-        headers: { Authorization: `Bearer ${authToken}` },
+        headers: { Authorization: `Bearer ${multiTestToken}` },
       });
 
       const finalCheckingBalance = await app.inject({
         method: 'GET',
-        url: `/api/v1/accounts/${checkingData.id}/balance`,
-        headers: { Authorization: `Bearer ${authToken}` },
+        url: `/api/v1/accounts/${checkingAccount.id}/balance`,
+        headers: { Authorization: `Bearer ${multiTestToken}` },
       });
 
       expect(JSON.parse(finalSavingsBalance.body).data.balance).toBe('4000'); // 5000 - 1000
-      expect(JSON.parse(finalCheckingBalance.body).data.balance).toBe('3000'); // 2000 + 1000
+      expect(JSON.parse(finalCheckingBalance.body).data.balance).toBe('1000'); // 0 + 1000 (auto-created starts at $0)
     });
 
     it('should maintain data consistency across complex operations', async () => {

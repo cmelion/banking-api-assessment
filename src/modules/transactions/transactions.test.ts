@@ -14,14 +14,15 @@ describe('Transaction Endpoints', () => {
   let _otherAccountId: string;
 
   // Helper function to create a user and get auth token
-  async function createUserAndAccount(email: string, name: string) {
+  async function createUserAndAccount(email: string, firstName: string, lastName: string) {
     const signupResponse = await app.inject({
       method: 'POST',
       url: '/api/v1/auth/signup',
       payload: {
         email,
         password: 'SecurePassword123',
-        name,
+        firstName,
+        lastName,
       },
     });
 
@@ -96,14 +97,14 @@ describe('Transaction Endpoints', () => {
 
     // Create main test user and account
     const uniqueEmail = `test-${Date.now()}@example.com`;
-    const userData = await createUserAndAccount(uniqueEmail, 'Transaction Test User');
+    const userData = await createUserAndAccount(uniqueEmail, 'Transaction', 'User');
     authToken = userData.token;
     userId = userData.id;
     accountId = userData.account;
 
     // Create other user for authorization tests
     const otherEmail = `other-${Date.now()}@example.com`;
-    const otherUserData = await createUserAndAccount(otherEmail, 'Other User');
+    const otherUserData = await createUserAndAccount(otherEmail, 'Other', 'User');
     otherUserToken = otherUserData.token;
     otherUserId = otherUserData.id;
     _otherAccountId = otherUserData.account;

@@ -26,7 +26,8 @@ describe('Cards Module', () => {
       payload: {
         email: uniqueEmail,
         password: 'SecurePassword123',
-        name: 'Card Test User',
+        firstName: 'Card',
+        lastName: 'User',
       },
     });
 
@@ -61,7 +62,8 @@ describe('Cards Module', () => {
       payload: {
         email: otherEmail,
         password: 'SecurePassword123',
-        name: 'Other Test User',
+        firstName: 'Other',
+        lastName: 'User',
       },
     });
 

@@ -7,7 +7,8 @@ const prisma = new PrismaClient();
 interface TestUser {
   email: string;
   password: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   accountType: string;
   initialBalance: number;
 }
@@ -16,42 +17,48 @@ const testUsers: TestUser[] = [
   {
     email: 'alice@banking.test',
     password: 'password123',
-    name: 'Alice Johnson',
+    firstName: 'Alice',
+    lastName: 'Johnson',
     accountType: 'CHECKING',
     initialBalance: 5000.00
   },
   {
     email: 'bob@banking.test',
     password: 'password123',
-    name: 'Bob Smith',
+    firstName: 'Bob',
+    lastName: 'Smith',
     accountType: 'SAVINGS',
     initialBalance: 15000.50
   },
   {
     email: 'charlie@banking.test',
     password: 'password123',
-    name: 'Charlie Brown',
+    firstName: 'Charlie',
+    lastName: 'Brown',
     accountType: 'CHECKING',
     initialBalance: 2500.75
   },
   {
     email: 'diana@banking.test',
     password: 'password123',
-    name: 'Diana Prince',
+    firstName: 'Diana',
+    lastName: 'Prince',
     accountType: 'CREDIT',
     initialBalance: -850.00
   },
   {
     email: 'edward@banking.test',
     password: 'password123',
-    name: 'Edward Wilson',
+    firstName: 'Edward',
+    lastName: 'Wilson',
     accountType: 'SAVINGS',
     initialBalance: 25000.00
   },
   {
     email: 'demo@banking.test',
     password: 'demo123',
-    name: 'Demo User',
+    firstName: 'Demo',
+    lastName: 'User',
     accountType: 'CHECKING',
     initialBalance: 1000.00
   }
@@ -80,7 +87,9 @@ async function createTestUsers() {
         data: {
           email: testUser.email,
           passwordHash: hashedPassword,
-          name: testUser.name,
+          firstName: testUser.firstName,
+          lastName: testUser.lastName,
+          name: `${testUser.firstName} ${testUser.lastName}`, // Computed field for backward compatibility
           status: 'ACTIVE'
         }
       });
@@ -114,11 +123,11 @@ async function createTestUsers() {
         });
       }
 
-      console.log(`✅ Created user: ${testUser.name} (${testUser.email})`);
+      console.log(`✅ Created user: ${testUser.firstName} ${testUser.lastName} (${testUser.email})`);
       console.log(`   Account: ${testUser.accountType} (${accountNumber}) - $${testUser.initialBalance}`);
 
     } catch (error) {
-      console.error(`❌ Failed to create user ${testUser.email}:`, error);
+      console.error(`❌ Failed to create user ${testUser.firstName} ${testUser.lastName} (${testUser.email}):`, error);
     }
   }
 

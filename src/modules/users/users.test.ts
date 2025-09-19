@@ -19,7 +19,8 @@ describe('Users Endpoints', () => {
       payload: {
         email: testEmail,
         password: 'SecurePassword123',
-        name: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
       },
     });
 
@@ -49,7 +50,8 @@ describe('Users Endpoints', () => {
       const body = JSON.parse(response.body);
       expect(body.success).toBe(true);
       expect(body.data.email).toBe(testEmail);
-      expect(body.data.name).toBe('Test User');
+      expect(body.data.firstName).toBe('Test');
+      expect(body.data.lastName).toBe('User');
       expect(body.data.accounts).toBeDefined();
     });
 

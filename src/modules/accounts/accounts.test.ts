@@ -22,7 +22,8 @@ describe('Account Endpoints', () => {
       payload: {
         email: uniqueEmail,
         password: 'SecurePassword123',
-        name: 'Account Test User',
+        firstName: 'Account',
+        lastName: 'User',
       },
     });
 
@@ -164,18 +165,34 @@ describe('Account Endpoints', () => {
 
   describe('GET /api/v1/accounts', () => {
     it('should list all user accounts', async () => {
+      // Create a fresh user to avoid interference from seed data
+      const listTestEmail = `list-test-${Date.now()}@example.com`;
+      const signupResponse = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/signup',
+        payload: {
+          email: listTestEmail,
+          password: 'SecurePassword123',
+          firstName: 'List',
+          lastName: 'User',
+        },
+      });
+
+      const signupBody = JSON.parse(signupResponse.body);
+      const listTestToken = signupBody.data.tokens.accessToken;
+
       // Create multiple accounts
       await app.inject({
         method: 'POST',
         url: '/api/v1/accounts',
-        headers: { Authorization: `Bearer ${authToken}` },
+        headers: { Authorization: `Bearer ${listTestToken}` },
         payload: { type: 'CHECKING', currency: 'USD' },
       });
 
       await app.inject({
         method: 'POST',
         url: '/api/v1/accounts',
-        headers: { Authorization: `Bearer ${authToken}` },
+        headers: { Authorization: `Bearer ${listTestToken}` },
         payload: { type: 'SAVINGS', currency: 'USD' },
       });
 
@@ -183,7 +200,7 @@ describe('Account Endpoints', () => {
         method: 'GET',
         url: '/api/v1/accounts',
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${listTestToken}`,
         },
       });
 
@@ -191,17 +208,33 @@ describe('Account Endpoints', () => {
       const body = JSON.parse(response.body);
       expect(body.success).toBe(true);
       expect(Array.isArray(body.data)).toBe(true);
-      expect(body.data).toHaveLength(2);
+      expect(body.data).toHaveLength(3); // 1 auto-created checking + 2 manually created
       expect(body.data[0].type).toBeDefined();
       expect(body.data[1].type).toBeDefined();
     });
 
     it('should return empty array for user with no accounts', async () => {
+      // Create a fresh user with no accounts
+      const freshEmail = `fresh-${Date.now()}@example.com`;
+      const signupResponse = await app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/signup',
+        payload: {
+          email: freshEmail,
+          password: 'SecurePassword123',
+          firstName: 'Fresh',
+          lastName: 'User',
+        },
+      });
+
+      const signupBody = JSON.parse(signupResponse.body);
+      const freshToken = signupBody.data.tokens.accessToken;
+
       const response = await app.inject({
         method: 'GET',
         url: '/api/v1/accounts',
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${freshToken}`,
         },
       });
 
@@ -209,7 +242,7 @@ describe('Account Endpoints', () => {
       const body = JSON.parse(response.body);
       expect(body.success).toBe(true);
       expect(Array.isArray(body.data)).toBe(true);
-      expect(body.data).toHaveLength(0);
+      expect(body.data).toHaveLength(1); // Auto-created checking account
     });
 
     it('should return 401 without authentication', async () => {
@@ -274,7 +307,8 @@ describe('Account Endpoints', () => {
         payload: {
           email: otherEmail,
           password: 'Password123',
-          name: 'Other User',
+          firstName: 'Other',
+          lastName: 'User',
         },
       });
 
@@ -303,8 +337,8 @@ describe('Account Endpoints', () => {
 
       expect(response.statusCode).toBe(403);
 
-      // Clean up other user
-      await prisma.account.delete({ where: { id: otherAccountId } });
+      // Clean up other user - delete all their accounts first
+      await prisma.account.deleteMany({ where: { ownerId: otherUserBody.data.user.id } });
       await prisma.user.delete({ where: { id: otherUserBody.data.user.id } });
     });
   });
@@ -377,7 +411,8 @@ describe('Account Endpoints', () => {
         payload: {
           email: otherEmail,
           password: 'Password123',
-          name: 'Other User 2',
+          firstName: 'Other',
+          lastName: 'User2',
         },
       });
 
@@ -409,8 +444,8 @@ describe('Account Endpoints', () => {
 
       expect(response.statusCode).toBe(403);
 
-      // Clean up other user
-      await prisma.account.delete({ where: { id: otherAccountId } });
+      // Clean up other user - delete all their accounts first
+      await prisma.account.deleteMany({ where: { ownerId: otherUserBody.data.user.id } });
       await prisma.user.delete({ where: { id: otherUserBody.data.user.id } });
     });
   });

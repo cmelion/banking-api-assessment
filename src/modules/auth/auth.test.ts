@@ -23,7 +23,8 @@ describe('Auth Endpoints', () => {
         payload: {
           email: uniqueEmail,
           password: 'SecurePassword123',
-          name: 'Test User',
+          firstName: 'Test',
+          lastName: 'User',
         },
       });
 
@@ -32,7 +33,8 @@ describe('Auth Endpoints', () => {
       expect(body.success).toBe(true);
       expect(body.data.user).toBeDefined();
       expect(body.data.user.email).toBe(uniqueEmail);
-      expect(body.data.user.name).toBe('Test User');
+      expect(body.data.user.firstName).toBe('Test');
+      expect(body.data.user.lastName).toBe('User');
       expect(body.data.tokens).toBeDefined();
       expect(body.data.tokens.accessToken).toBeDefined();
       expect(body.data.tokens.refreshToken).toBeDefined();
@@ -48,7 +50,8 @@ describe('Auth Endpoints', () => {
         payload: {
           email: duplicateEmail,
           password: 'SecurePassword123',
-          name: 'First User',
+          firstName: 'First',
+          lastName: 'User',
         },
       });
 
@@ -59,7 +62,8 @@ describe('Auth Endpoints', () => {
         payload: {
           email: duplicateEmail,
           password: 'SecurePassword123',
-          name: 'Second User',
+          firstName: 'Second',
+          lastName: 'User',
         },
       });
 
@@ -73,7 +77,8 @@ describe('Auth Endpoints', () => {
         payload: {
           email: 'test@example.com',
           password: '123', // Too short
-          name: 'Test User',
+          firstName: 'Test',
+          lastName: 'User',
         },
       });
 
@@ -92,7 +97,8 @@ describe('Auth Endpoints', () => {
         payload: {
           email: loginEmail,
           password: 'SecurePassword123',
-          name: 'Login User',
+          firstName: 'Login',
+          lastName: 'User',
         },
       });
 
@@ -161,7 +167,8 @@ describe('Auth Endpoints', () => {
         payload: {
           email: loginEmail,
           password: 'CorrectPassword123',
-          name: 'Test User',
+          firstName: 'Test',
+          lastName: 'User',
         },
       });
 
@@ -207,7 +214,7 @@ describe('Auth Endpoints', () => {
   });
 
   describe('Input Validation', () => {
-    it('should return error for missing name in signup', async () => {
+    it('should return error for missing firstName in signup', async () => {
       const response = await app.inject({
         method: 'POST',
         url: '/api/v1/auth/signup',
@@ -226,7 +233,8 @@ describe('Auth Endpoints', () => {
         url: '/api/v1/auth/signup',
         payload: {
           password: 'SecurePassword123',
-          name: 'Test User',
+          firstName: 'Test',
+          lastName: 'User',
         },
       });
 
