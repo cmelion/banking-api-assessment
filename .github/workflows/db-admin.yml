@@ -56,6 +56,28 @@ jobs:
             echo "⚠️  WARNING: Resetting database - all data will be lost!"
             npx prisma migrate reset --force
           else
+            echo "📊 Checking migration status..."
+            MIGRATION_STATUS=$(npx prisma migrate status 2>&1 || echo "migration_check_failed")
+
+            if echo "$MIGRATION_STATUS" | grep -q "migrate found failed migrations"; then
+              echo "🔧 Found failed migrations. Checking which ones..."
+
+              # Get list of failed migrations from the status output
+              FAILED_MIGRATIONS=$(echo "$MIGRATION_STATUS" | grep -o "The \`[^']*\` migration" | sed 's/The `\(.*\)` migration/\1/' || echo "")
+
+              if [ -n "$FAILED_MIGRATIONS" ]; then
+                echo "Failed migrations found:"
+                echo "$FAILED_MIGRATIONS"
+
+                # Ask user to manually resolve since we can't assume which migrations are safe to mark as applied
+                echo "❌ Failed migrations detected. Please resolve manually by either:"
+                echo "   1. Use 'reset-and-seed' action to reset the database"
+                echo "   2. Manually run: npx prisma migrate resolve --applied <migration_name>"
+                exit 1
+              fi
+            fi
+
+            echo "🚀 Deploying migrations..."
             npx prisma migrate deploy
           fi
           echo "✅ Migrations completed"
