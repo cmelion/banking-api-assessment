@@ -12,8 +12,6 @@ dist
 
 # Claude Code settings (may contain sensitive credentials)
 .claude/
-# Documentation with potential credentials
-docs/
 
 # Any files with credentials
 *credentials*
