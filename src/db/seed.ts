@@ -17,7 +17,9 @@ async function main() {
       data: {
         email: 'test@example.com',
         passwordHash: hashedPassword,
-        name: 'Test User',
+        firstName: 'Test',
+        lastName: 'User',
+        name: 'Test User', // Computed field for backward compatibility
         status: 'ACTIVE'
       }
     });

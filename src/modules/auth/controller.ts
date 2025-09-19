@@ -14,9 +14,9 @@ export class AuthController {
       throw new ValidationError('Invalid request data', validation.error.issues);
     }
 
-    const { email, password, name } = validation.data;
+    const { email, password, firstName, lastName } = validation.data;
 
-    const result = await authService.signup(email, password, name);
+    const result = await authService.signup(email, password, firstName, lastName);
 
     const response: ApiResponse = {
       success: true,

@@ -21,6 +21,8 @@ async function userRoutes(fastify: FastifyInstance) {
               properties: {
                 id: { type: 'string' },
                 email: { type: 'string' },
+                firstName: { type: 'string' },
+                lastName: { type: 'string' },
                 name: { type: 'string' },
                 status: { type: 'string' },
                 createdAt: { type: 'string' },
@@ -71,6 +73,8 @@ async function userRoutes(fastify: FastifyInstance) {
               properties: {
                 id: { type: 'string' },
                 email: { type: 'string' },
+                firstName: { type: 'string' },
+                lastName: { type: 'string' },
                 name: { type: 'string' },
                 status: { type: 'string' },
                 createdAt: { type: 'string' },
@@ -109,6 +113,8 @@ async function userRoutes(fastify: FastifyInstance) {
                 properties: {
                   id: { type: 'string' },
                   email: { type: 'string' },
+                  firstName: { type: 'string' },
+                  lastName: { type: 'string' },
                   name: { type: 'string' },
                   status: { type: 'string' },
                   createdAt: { type: 'string' },
@@ -167,6 +173,8 @@ async function userRoutes(fastify: FastifyInstance) {
               properties: {
                 id: { type: 'string' },
                 email: { type: 'string' },
+                firstName: { type: 'string' },
+                lastName: { type: 'string' },
                 name: { type: 'string' },
                 status: { type: 'string' },
                 createdAt: { type: 'string' },

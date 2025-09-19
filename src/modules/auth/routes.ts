@@ -12,11 +12,12 @@ async function authRoutes(fastify: FastifyInstance) {
       tags: ['Authentication'],
       body: {
         type: 'object',
-        required: ['email', 'password', 'name'],
+        required: ['email', 'password', 'firstName', 'lastName'],
         properties: {
           email: { type: 'string', format: 'email' },
           password: { type: 'string', minLength: 8 },
-          name: { type: 'string', minLength: 1, maxLength: 100 },
+          firstName: { type: 'string', minLength: 1, maxLength: 50 },
+          lastName: { type: 'string', minLength: 1, maxLength: 50 },
         },
       },
       response: {
@@ -32,6 +33,8 @@ async function authRoutes(fastify: FastifyInstance) {
                   properties: {
                     id: { type: 'string' },
                     email: { type: 'string' },
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
                     name: { type: 'string' },
                     status: { type: 'string' },
                     createdAt: { type: 'string' },
@@ -80,6 +83,8 @@ async function authRoutes(fastify: FastifyInstance) {
                   properties: {
                     id: { type: 'string' },
                     email: { type: 'string' },
+                    firstName: { type: 'string' },
+                    lastName: { type: 'string' },
                     name: { type: 'string' },
                     status: { type: 'string' },
                     createdAt: { type: 'string' },

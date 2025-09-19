@@ -7,13 +7,13 @@ import { AuthTokens, JwtPayload, UserRole } from '../../lib/types';
 import { User } from '@prisma/client';
 
 // User type for API responses (excluding sensitive fields)
-type SafeUser = Pick<User, 'id' | 'email' | 'name' | 'status' | 'createdAt'>;
+type SafeUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'name' | 'status' | 'createdAt'>;
 
 export class AuthService {
-  async signup(email: string, password: string, name: string): Promise<{ user: SafeUser; tokens: AuthTokens }> {
+  async signup(email: string, password: string, firstName: string, lastName: string): Promise<{ user: SafeUser; tokens: AuthTokens }> {
     // Validate input
-    if (!email || !password || !name) {
-      throw new ValidationError('Email, password, and name are required');
+    if (!email || !password || !firstName || !lastName) {
+      throw new ValidationError('Email, password, firstName, and lastName are required');
     }
 
     if (password.length < 8) {
@@ -44,12 +44,16 @@ export class AuthService {
         data: {
           email,
           passwordHash,
-          name,
+          firstName,
+          lastName,
+          name: `${firstName} ${lastName}`, // Computed field for backward compatibility
           status: 'ACTIVE',
         },
         select: {
           id: true,
           email: true,
+          firstName: true,
+          lastName: true,
           name: true,
           status: true,
           createdAt: true,
@@ -94,6 +98,8 @@ export class AuthService {
       select: {
         id: true,
         email: true,
+        firstName: true,
+        lastName: true,
         name: true,
         status: true,
         passwordHash: true,
@@ -122,6 +128,8 @@ export class AuthService {
     const userResponse = {
       id: user.id,
       email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
       name: user.name,
       status: user.status,
       createdAt: user.createdAt,

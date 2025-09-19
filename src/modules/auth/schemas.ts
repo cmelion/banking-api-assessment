@@ -4,7 +4,8 @@ import { z } from 'zod';
 export const signupSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(8, 'Password must be at least 8 characters long'),
-  name: z.string().min(1, 'Name is required').max(100, 'Name too long'),
+  firstName: z.string().min(1, 'First name is required').max(50, 'First name too long'),
+  lastName: z.string().min(1, 'Last name is required').max(50, 'Last name too long'),
 });
 
 export const loginSchema = z.object({
@@ -20,6 +21,8 @@ export const refreshTokenSchema = z.object({
 export const userResponseSchema = z.object({
   id: z.string(),
   email: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
   name: z.string(),
   status: z.string(),
   createdAt: z.date(),

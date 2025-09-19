@@ -8,6 +8,8 @@ export class UserService {
       select: {
         id: true,
         email: true,
+        firstName: true,
+        lastName: true,
         name: true,
         status: true,
         createdAt: true,
@@ -42,20 +44,20 @@ export class UserService {
       throw new NotFoundError('User');
     }
 
-    const updatedUser = await prisma.user.update({
+    return await prisma.user.update({
       where: { id: userId },
       data: updates,
       select: {
         id: true,
         email: true,
+        firstName: true,
+        lastName: true,
         name: true,
         status: true,
         createdAt: true,
         updatedAt: true,
       },
     });
-
-    return updatedUser;
   }
 
   async getAllUsers(page: number = 1, limit: number = 10) {
@@ -68,6 +70,8 @@ export class UserService {
         select: {
           id: true,
           email: true,
+          firstName: true,
+          lastName: true,
           name: true,
           status: true,
           createdAt: true,
@@ -108,6 +112,8 @@ export class UserService {
       select: {
         id: true,
         email: true,
+        firstName: true,
+        lastName: true,
         name: true,
         status: true,
         createdAt: true,

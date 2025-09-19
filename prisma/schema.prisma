@@ -13,10 +13,12 @@ model User {
   id            String         @id @default(cuid())
   email         String         @unique
   passwordHash  String         @map("password_hash")
-  name          String
+  name          String?
   status        String         @default("ACTIVE")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
+  firstName     String         @map("first_name")
+  lastName      String         @map("last_name")
   accounts      Account[]
   refreshTokens RefreshToken[]
 
