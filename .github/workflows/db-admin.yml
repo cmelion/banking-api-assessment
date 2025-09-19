@@ -101,7 +101,7 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: |
           echo "🔍 Verifying database connectivity..."
-          npx prisma db execute --stdin <<< "SELECT 1 as health_check;"
+          echo "SELECT 1 as health_check;" | npx prisma db execute --stdin
           echo "✅ Database is healthy"
 
       - name: Log operation summary
