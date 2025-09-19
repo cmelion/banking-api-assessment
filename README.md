@@ -159,6 +159,10 @@ src/
 
 🖥️ **Banking Client**: [https://banking-client-nine.vercel.app](https://banking-client-nine.vercel.app)
 
+**Demo Video:**
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-z9d9ayu01s?si=uGeyLRFfoWkOosRW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 **Public Endpoints** (no authentication required):
 - Health Check: [https://banking-api-assessment.vercel.app/health](https://banking-api-assessment.vercel.app/health)
 - Readiness Check: [https://banking-api-assessment.vercel.app/ready](https://banking-api-assessment.vercel.app/ready)
