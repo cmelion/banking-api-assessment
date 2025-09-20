@@ -1,0 +1,131 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String         @map("password_hash")
+  name          String?
+  status        String         @default("ACTIVE")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  firstName     String         @map("first_name")
+  lastName      String         @map("last_name")
+  accounts      Account[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Account {
+  id            String        @id @default(cuid())
+  accountNumber String        @unique @map("account_number")
+  type          String
+  currency      String        @default("USD")
+  balance       Decimal       @default(0)
+  ownerId       String        @map("owner_id")
+  status        String        @default("ACTIVE")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  owner         User          @relation(fields: [ownerId], references: [id])
+  cards         Card[]
+  statements    Statement[]
+  transactions  Transaction[]
+  transfersFrom Transfer[]    @relation("FromAccount")
+  transfersTo   Transfer[]    @relation("ToAccount")
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id           String    @id @default(cuid())
+  accountId    String    @map("account_id")
+  type         String
+  amount       Decimal
+  currency     String    @default("USD")
+  description  String?
+  counterparty String?
+  transferId   String?   @map("transfer_id")
+  balanceAfter Decimal   @map("balance_after")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  account      Account   @relation(fields: [accountId], references: [id])
+  transfer     Transfer? @relation(fields: [transferId], references: [id])
+
+  @@map("transactions")
+}
+
+model Transfer {
+  id             String        @id @default(cuid())
+  fromAccountId  String        @map("from_account_id")
+  toAccountId    String        @map("to_account_id")
+  amount         Decimal
+  currency       String        @default("USD")
+  description    String?
+  status         String        @default("PENDING")
+  idempotencyKey String?       @unique @map("idempotency_key")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  transactions   Transaction[]
+  fromAccount    Account       @relation("FromAccount", fields: [fromAccountId], references: [id])
+  toAccount      Account       @relation("ToAccount", fields: [toAccountId], references: [id])
+
+  @@map("transfers")
+}
+
+model Card {
+  id        String   @id @default(cuid())
+  accountId String   @map("account_id")
+  maskedPan String   @map("masked_pan")
+  brand     String
+  last4     String
+  expMonth  Int      @map("exp_month")
+  expYear   Int      @map("exp_year")
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  account   Account  @relation(fields: [accountId], references: [id])
+
+  @@map("cards")
+}
+
+model Statement {
+  id          String   @id @default(cuid())
+  accountId   String   @map("account_id")
+  periodStart DateTime @map("period_start")
+  periodEnd   DateTime @map("period_end")
+  fileUrl     String?  @map("file_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  account     Account  @relation(fields: [accountId], references: [id])
+
+  @@map("statements")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model IdempotencyKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  response  String
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
+
+  @@map("idempotency_keys")
+}

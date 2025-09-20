@@ -21,6 +21,11 @@
     "db:reset": "prisma migrate reset --force",
     "db:seed": "tsx src/db/seed.ts",
     "db:migrate-from-sqlite": "tsx scripts/migrate-data-sqlite-to-postgres.ts",
+    "db:use-sqlite": "cp prisma/schema.sqlite.prisma prisma/schema.prisma && echo 'Switched to SQLite schema'",
+    "db:use-postgres": "cp prisma/schema.postgres.prisma prisma/schema.prisma && echo 'Switched to PostgreSQL schema'",
+    "db:sqlite:generate": "npm run db:use-sqlite && prisma generate",
+    "db:postgres:generate": "npm run db:use-postgres && prisma generate",
+    "test:sqlite": "npm run db:use-sqlite && DATABASE_URL='file:./test.db' npm test",
     "docker:build": "docker build -t banking-api .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"

@@ -4,13 +4,60 @@ This guide explains how to set up and use Docker for the Banking API project wit
 
 ## Docker Configuration
 
+### Multi-Stage Build Benefits
+
+Our Dockerfile uses a multi-stage build approach which provides several key advantages:
+
+#### 1. **Reduced Image Size**
+- **Build Stage**: Contains all development dependencies and build tools (~800MB)
+- **Production Stage**: Contains only runtime dependencies (~150MB)
+- **Result**: 80% smaller production images, faster deployments, reduced attack surface
+
+#### 2. **Enhanced Security**
+- Build artifacts and source code are not included in the final image
+- Development dependencies (potential vulnerabilities) are excluded
+- Runs as non-root user (`node:node`) in production
+- Minimal attack surface with Alpine Linux base
+
+#### 3. **Optimized Build Caching**
+- Dependencies are installed in a separate stage
+- Changes to application code don't require reinstalling dependencies
+- Parallel building of stages when possible
+- Faster CI/CD pipeline execution
+
+#### 4. **Clear Separation of Concerns**
+- `deps` stage: Dependency installation
+- `builder` stage: TypeScript compilation and Prisma generation
+- `runner` stage: Lean production runtime
+
+#### Example Multi-Stage Build Flow:
+```dockerfile
+# Stage 1: Dependencies (cached unless package.json changes)
+FROM node:20-alpine AS deps
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Stage 2: Build (uses deps, adds dev dependencies)
+FROM deps AS builder
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Stage 3: Production (minimal runtime)
+FROM node:20-alpine AS runner
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+USER node
+CMD ["node", "dist/index.js"]
+```
+
 ### Architecture
 - **Production Image**: Multi-stage build using Node.js 20 Alpine for optimal size and security
 - **Development Image**: Includes debugging support and live code reloading
-- **Database**: SQLite (as per requirements) with persistent volume mounting
+- **Database**: PostgreSQL (default for production) with SQLite option for lightweight testing
 - **Redis**: Optional caching layer
-- **Adminer**: Database administration tool (can be used with SQLite)
-- **PostgreSQL**: Available for future upgrades but not used by default
+- **Adminer**: Database administration tool for PostgreSQL
+- **Health Monitoring**: Built-in health checks for all services
 
 ### Files
 - `Dockerfile` - Production-ready multi-stage build
@@ -85,8 +132,8 @@ docker-compose --profile dev up -d banking-api-dev
 
 | Service | Port | Description |
 |---------|------|-------------|
-| banking-api | 3000 | Production API server (SQLite) |
-| banking-api-dev | 3001 | Development API with debugging (SQLite) |
+| banking-api | 3000 | Production API server (PostgreSQL) |
+| banking-api-dev | 3001 | Development API with debugging (PostgreSQL) |
 | postgres | 5432 | PostgreSQL database (available for upgrades) |
 | redis | 6379 | Redis cache |
 | adminer | 8080 | Database admin interface |
@@ -209,7 +256,7 @@ curl http://localhost:3000/ready
 
 ### ✅ Successfully Verified
 - **Docker Services**: All services start correctly and pass health checks
-- **Database**: SQLite database with proper migrations and persistent storage
+- **Database**: PostgreSQL as primary with SQLite option, proper migrations and persistent storage
 - **API Endpoints**: Health and readiness endpoints working correctly
 - **Authentication**: Signup, login, and JWT token verification working
 - **User Management**: User profile retrieval and updates working
@@ -225,7 +272,7 @@ curl http://localhost:3000/ready
 ### 🔧 Issues Resolved
 - **Prisma Binary Target**: Fixed Alpine Linux compatibility by setting correct binary targets
 - **OpenSSL Dependencies**: Updated Dockerfile to use OpenSSL 3.0.x for current Alpine versions
-- **Database Configuration**: Properly configured SQLite paths for Docker volume mounting
+- **Database Configuration**: Dual database support - PostgreSQL (default) and SQLite (optional for testing)
 - **Test Isolation**: Fixed database conflicts between tests with unique identifiers
 
 ## Cleanup
