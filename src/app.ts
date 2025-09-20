@@ -5,6 +5,7 @@ import { serverConfig, apiConfig, features } from './config';
 import loggingPlugin from './plugins/logging';
 import healthPlugin from './plugins/health';
 import errorHandlerPlugin from './plugins/error-handler';
+import sentryPlugin from './plugins/sentry';
 
 export async function createApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -15,6 +16,7 @@ export async function createApp(): Promise<FastifyInstance> {
 
   // Register core plugins
   await app.register(loggingPlugin);
+  await app.register(sentryPlugin); // Optional - only activates if configured
   await app.register(errorHandlerPlugin);
 
   // Register CORS

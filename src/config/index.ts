@@ -22,6 +22,11 @@ const envSchema = z.object({
   // API Configuration
   API_VERSION: z.string().default('v1'),
   CORS_ORIGIN: z.string().default('*'),
+
+  // Sentry Error Tracking
+  SENTRY_DSN: z.string().optional(),
+  SENTRY_ENVIRONMENT: z.string().optional(),
+  SENTRY_ENABLED: z.string().default('false'),
 });
 
 // Validate environment variables
@@ -78,4 +83,5 @@ export const features = {
   detailedErrors: config.NODE_ENV === 'development',
 };
 
+export const env = config;
 export default config;
