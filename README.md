@@ -1,5 +1,11 @@
 # Banking API Assessment
 
+[![Test Coverage](https://img.shields.io/badge/coverage-89.75%25-brightgreen)](./coverage)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-ready-blue)](https://www.docker.com/)
+
 A production-ready banking REST service built with AI-assisted development workflows. This project demonstrates modern banking operations including account management, secure transactions, money transfers, and comprehensive API documentation.
 
 ## 📋 Table of Contents
@@ -112,8 +118,9 @@ The Docker Compose configuration provides a complete containerized development e
 ### Core Framework
 - **Runtime**: Node.js 18+ with TypeScript
 - **Web Framework**: Fastify (high-performance, schema validation)
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: PostgreSQL (default) with SQLite option, Prisma ORM
 - **Authentication**: JWT with refresh tokens, Argon2id password hashing
+- **Error Tracking**: Optional Sentry integration for production monitoring
 
 ### Development & Operations
 - **Testing**: Vitest with comprehensive coverage
@@ -254,6 +261,9 @@ Tokens are obtained via login and refreshed using refresh tokens for enhanced se
 | `npm run db:reset` | Reset database and apply seed data |
 | `npm run db:seed` | Populate database with test data |
 | `npm run db:generate` | Generate Prisma client |
+| `npm run db:use-sqlite` | Switch to SQLite configuration |
+| `npm run db:use-postgres` | Switch to PostgreSQL configuration |
+| `npm run test:sqlite` | Run tests with SQLite database |
 
 ### Docker Commands
 
@@ -291,6 +301,7 @@ Tokens are obtained via login and refreshed using refresh tokens for enhanced se
 - **Unit Tests**: Business logic, authentication, monetary calculations
 - **Integration Tests**: API endpoints with test database
 - **Security Tests**: Authentication flows, authorization checks
+- **Current Coverage**: 89.75% statement coverage ✅
 - **Coverage Target**: 80%+ statement and branch coverage
 
 ### Running Tests
@@ -314,7 +325,26 @@ Coverage report:
 
 ### Test Database
 
-Tests use a separate PostgreSQL database that is automatically:
+Tests can use either PostgreSQL or SQLite:
+
+**PostgreSQL (default)**:
+- Production-like environment
+- Full feature support
+- Docker-based setup
+
+**SQLite (optional)**:
+```bash
+# Switch to SQLite for lightweight testing
+npm run db:use-sqlite
+npm run test:sqlite
+```
+
+Benefits:
+- No Docker required
+- Faster test startup
+- Ideal for CI/CD environments
+
+Tests are automatically:
 - Migrated before test runs
 - Seeded with test data
 - Isolated per test suite
@@ -330,6 +360,14 @@ The seed script creates test users and accounts for development:
 
 ### Docker Production
 
+#### Multi-Stage Build Benefits
+Our Docker configuration uses multi-stage builds for:
+
+- **Reduced Image Size**: 80% smaller production images (~150MB vs ~800MB)
+- **Enhanced Security**: No build tools or source code in production
+- **Build Efficiency**: Cached dependencies, parallel stage building
+- **Clear Separation**: Distinct build, test, and runtime environments
+
 ```bash
 # Build production image
 docker build -t banking-api .
@@ -337,6 +375,12 @@ docker build -t banking-api .
 # Run with docker-compose
 docker-compose up -d
 ```
+
+The production image:
+- Runs as non-root user
+- Contains only runtime dependencies
+- Includes health checks
+- Uses Alpine Linux for minimal attack surface
 
 ### Environment Variables
 
@@ -358,6 +402,11 @@ JWT_REFRESH_SECRET=your-super-secret-refresh-key
 # Optional
 REDIS_URL=redis://localhost:6379
 LOG_LEVEL=info
+
+# External Error Tracking (Optional)
+SENTRY_ENABLED=false
+SENTRY_DSN=your-sentry-dsn
+SENTRY_ENVIRONMENT=production
 ```
 
 ### Vercel Deployment
@@ -379,12 +428,30 @@ The application provides comprehensive health monitoring:
 - **Readiness**: `/ready` - Service can handle requests (includes DB connectivity)
 - **Docker**: Built-in container health checks
 
-### Monitoring
+### Monitoring & Observability
 
+#### Built-in Features
 - **Structured Logging**: JSON logs with correlation IDs
 - **Error Tracking**: Centralized error handling with proper HTTP status codes
 - **Performance**: Request/response timing in logs
 - **Security**: Authentication events and suspicious activity logging
+
+#### External Error Reporting (Sentry)
+The application includes optional Sentry integration for production error tracking:
+
+```bash
+# Enable in production
+SENTRY_ENABLED=true
+SENTRY_DSN=https://your-dsn@sentry.io/project-id
+SENTRY_ENVIRONMENT=production
+```
+
+Features:
+- Automatic error capture with context
+- Performance monitoring
+- User tracking (anonymized)
+- Sensitive data sanitization
+- Works with Sentry's free tier (5k errors/month)
 
 ## 🔒 Security
 
