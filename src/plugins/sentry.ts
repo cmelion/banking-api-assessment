@@ -23,7 +23,7 @@ export default fp(async function sentryPlugin(fastify: FastifyInstance) {
       integrations: [
         nodeProfilingIntegration(),
       ],
-      beforeSend(event, hint) {
+      beforeSend(event, _hint) {
         // Sanitize sensitive data
         if (event.request) {
           // Remove authorization headers
@@ -59,7 +59,7 @@ export default fp(async function sentryPlugin(fastify: FastifyInstance) {
     fastify.log.info(`Sentry error tracking initialized for environment: ${sentryEnvironment}`);
 
     // Add request context to Sentry
-    fastify.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
+    fastify.addHook('onRequest', async (request: FastifyRequest, _reply: FastifyReply) => {
       Sentry.setContext('request', {
         id: request.id,
         method: request.method,
@@ -68,8 +68,8 @@ export default fp(async function sentryPlugin(fastify: FastifyInstance) {
       });
 
       // Set user context if authenticated
-      if ((request as any).user) {
-        const user = (request as any).user;
+      if ((request as FastifyRequest & { user?: { id: string; username: string } }).user) {
+        const user = (request as FastifyRequest & { user: { id: string; username: string } }).user;
         Sentry.setUser({
           id: user.id,
           username: user.username,
@@ -94,8 +94,8 @@ export default fp(async function sentryPlugin(fastify: FastifyInstance) {
           });
 
           // Add user context
-          if ((request as any).user) {
-            const user = (request as any).user;
+          if ((request as FastifyRequest & { user?: { id: string; username: string } }).user) {
+            const user = (request as FastifyRequest & { user: { id: string; username: string } }).user;
             scope.setUser({
               id: user.id,
               username: user.username,
@@ -113,7 +113,7 @@ export default fp(async function sentryPlugin(fastify: FastifyInstance) {
     });
 
     // Clear context after response
-    fastify.addHook('onResponse', async (request: FastifyRequest, reply: FastifyReply) => {
+    fastify.addHook('onResponse', async (_request: FastifyRequest, _reply: FastifyReply) => {
       Sentry.setContext('request', null);
       Sentry.setUser(null);
     });
