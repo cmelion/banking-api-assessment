@@ -164,7 +164,7 @@ src/
 
 🌐 **Production API**: [https://banking-api-assessment.vercel.app](https://banking-api-assessment.vercel.app)
 
-🖥️ **Banking Client**: [https://banking-client-nine.vercel.app](https://banking-client-nine.vercel.app)
+🖥️ **Banking Client**: [https://banking-client-nine.vercel.app](https://banking-client-nine.vercel.app) (* use test@example.com/password123)
 
 **Demo Video:**
 
